@@ -1,0 +1,13 @@
+pyqt5 == 5.15.4
+polars == 0.19.3
+pandas == 1.4.0
+xlsx2csv == 0.8.1
+minimalmodbus == 2.0.1
+telemetrix == 1.35
+openpyxl == 3.0.7
+numpy == 1.23.5
+xlsxwriter == 3.0.3
+xlwings == 0.27.15
+pyarrow == 13.0.0
+mako == 1.2.4
+auto-py-to-exe == 2.41

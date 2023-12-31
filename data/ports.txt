@@ -1,0 +1,6 @@
+Weight scale to PC: COM5
+Arduino to PC: COM4
+Database: G
+Arduino to Conveyor: 8
+Server: 192.168.0.2
+Port: 1433

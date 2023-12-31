@@ -1,0 +1,109 @@
+{
+ "version": "auto-py-to-exe-configuration_v1",
+ "pyinstallerOptions": [
+  {
+   "optionDest": "noconfirm",
+   "value": true
+  },
+  {
+   "optionDest": "filenames",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/CheckWeigher.py"
+  },
+  {
+   "optionDest": "onefile",
+   "value": false
+  },
+  {
+   "optionDest": "console",
+   "value": false
+  },
+  {
+   "optionDest": "icon_file",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/pic/logo.ico"
+  },
+  {
+   "optionDest": "clean_build",
+   "value": false
+  },
+  {
+   "optionDest": "strip",
+   "value": false
+  },
+  {
+   "optionDest": "noupx",
+   "value": false
+  },
+  {
+   "optionDest": "disable_windowed_traceback",
+   "value": false
+  },
+  {
+   "optionDest": "uac_admin",
+   "value": false
+  },
+  {
+   "optionDest": "uac_uiaccess",
+   "value": false
+  },
+  {
+   "optionDest": "argv_emulation",
+   "value": false
+  },
+  {
+   "optionDest": "bootloader_ignore_signals",
+   "value": false
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/Function;Function/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/SubFunction;SubFunction/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/UI;UI/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/tab;tab/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/version.txt;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/pyarrow;pyarrow/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/serial;serial/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/telemetrix;telemetrix/"
+  },
+  {
+   "optionDest": "hiddenimports",
+   "value": "xlwings"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/minimalmodbus.py;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/xlsx2csv.py;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/version.txt;."
+  }
+ ],
+ "nonPyinstallerOptions": {
+  "increaseRecursionLimit": true,
+  "manualArguments": ""
+ }
+}

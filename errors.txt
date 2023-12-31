@@ -1,0 +1,163 @@
+2023-11-04 10:12:47,059 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 37, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+2023-11-04 10:16:01,155 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 37, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+2023-11-04 10:16:34,700 Failed 
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 37, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+2023-11-04 10:16:56,744 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 37, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+2023-11-04 10:17:05,095 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 37, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+
+2023-11-04 10:17:42,562 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 37, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+
+2023-11-04 10:44:28,909 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 39, in openPort
+    self.scale = Instrument(self.portScale, 1, close_port_after_each_call = True)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+
+2023-11-07 15:53:45,980 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 39, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+
+2023-11-07 15:55:53,376 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 39, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+
+2023-11-07 15:57:26,203 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 39, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+
+2023-11-07 15:57:55,838 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 39, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+
+2023-11-07 15:59:30,172 Failed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\Trung\Ansell\Checkweigher\Function\Scale.py", line 39, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "c:\Users\PC\Desktop\Trung\Ansell\venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
