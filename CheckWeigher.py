@@ -21,6 +21,9 @@ class MainGUI(QtWidgets.QMainWindow):
         portScale = data['portScale']
         portArduino = data['portArduino']
         Ard2Convey = data['Ard2Convey']
+        self.Delay2Print = data['Delay2Print']
+        self.Delay2Con = data['Delay2Con']
+        self.Quan2Print = data['Quan2Print']
         self.loaddata = LoadData(self, fileData=fileData, filePrint=filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
         self.print = Print(self, filePrint=filePrint)
         self.scale = GetScale(portScale=portScale, portArduino=portArduino, Ard2Convey=Ard2Convey)
@@ -110,10 +113,10 @@ class MainGUI(QtWidgets.QMainWindow):
             self.t2 = 0
             return
         if not self.printed:
-            if self.t1 < 70:
+            if self.t1 < self.Delay2Print:
                 self.t1 += 1
-            if self.t1 >= 70 and \
-                ((self.dataR+(self.maxwe-self.minwe) < self.maxwe and self.dataR+(self.maxwe-self.minwe) > self.minwe) or
+            if self.t1 >= self.Delay2Print and \
+                ((self.dataR+abs(12-self.Quan2Print)*(self.maxwe-self.minwe) < self.maxwe and self.dataR+abs(12-self.Quan2Print)*(self.maxwe-self.minwe) > self.minwe) or
                     (self.dataR <= self.maxwe and self.dataR >= self.minwe)):
                     self.CheckStamp()
                     self.count += 1
@@ -121,9 +124,9 @@ class MainGUI(QtWidgets.QMainWindow):
                     self.ShowPO()
                     self.t1 = 0
         if self.dataR <= self.maxwe and self.dataR >= self.minwe and not self.scale.full:
-            if self.t2 < 20:
+            if self.t2 < self.Delay2Con:
                 self.t2 += 1
-            if self.t2 >= 20:
+            if self.t2 >= self.Delay2Con:
                 self.scale.full = True
                 self.t2 = 0
         elif self.dataR < self.minwe/11.5:
