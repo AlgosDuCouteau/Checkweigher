@@ -74,32 +74,32 @@
    "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/version.txt;."
   },
   {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/pyarrow;pyarrow/"
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/serial;serial/"
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/telemetrix;telemetrix/"
-  },
-  {
    "optionDest": "hiddenimports",
    "value": "xlwings"
   },
   {
    "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/minimalmodbus.py;."
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/venv/Lib/site-packages/xlsx2csv.py;."
-  },
-  {
-   "optionDest": "datas",
    "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/version.txt;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/pyarrow;pyarrow/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/serial;serial/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/telemetrix;telemetrix/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/minimalmodbus.py;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/xlsx2csv.py;."
   }
  ],
  "nonPyinstallerOptions": {
