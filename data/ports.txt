@@ -5,4 +5,5 @@ Arduino to Conveyor: 8
 Server: 192.168.0.2
 Port: 1433
 Delay2Print(ms): 100
+Delay2Con(ms - old): 100
 Quan2Print: 11
