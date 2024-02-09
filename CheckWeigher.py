@@ -22,7 +22,6 @@ class MainGUI(QtWidgets.QMainWindow):
         portArduino = data['portArduino']
         Ard2Convey = data['Ard2Convey']
         self.Delay2Print = data['Delay2Print']
-        self.Delay2Con = data['Delay2Con']
         self.Quan2Print = data['Quan2Print']
         self.loaddata = LoadData(self, fileData=fileData, filePrint=filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
         self.print = Print(self, filePrint=filePrint)
@@ -123,10 +122,14 @@ class MainGUI(QtWidgets.QMainWindow):
                     self.printed = True
                     self.ShowPO()
                     self.t1 = 0
+        if self.t2 > 0:
+            self.ui.Status.setText(str(float(self.t2/10)))
+        else:
+            self.ui.Status.setText("")
         if self.dataR <= self.maxwe and self.dataR >= self.minwe and not self.scale.full:
-            if self.t2 < self.Delay2Con:
+            if self.t2 < self.Delay2Print:
                 self.t2 += 1
-            if self.t2 >= self.Delay2Con:
+            if self.t2 >= self.Delay2Print:
                 self.scale.full = True
                 self.t2 = 0
         elif self.dataR < self.minwe/11.5:
