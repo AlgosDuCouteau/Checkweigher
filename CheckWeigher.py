@@ -111,17 +111,19 @@ class MainGUI(QtWidgets.QMainWindow):
             self.t1 = 0
             self.t2 = 0
             return
-        if not self.printed:
+        if not self.printed and \
+            ((self.dataR+abs(12-self.Quan2Print)*(self.maxwe-self.minwe) < self.maxwe and self.dataR+abs(12-self.Quan2Print)*(self.maxwe-self.minwe) > self.minwe) or
+            (self.dataR <= self.maxwe and self.dataR >= self.minwe)):
             if self.t1 < self.Delay2Print:
                 self.t1 += 1
-            if self.t1 >= self.Delay2Print and \
-                ((self.dataR+abs(12-self.Quan2Print)*(self.maxwe-self.minwe) < self.maxwe and self.dataR+abs(12-self.Quan2Print)*(self.maxwe-self.minwe) > self.minwe) or
-                    (self.dataR <= self.maxwe and self.dataR >= self.minwe)):
-                    self.CheckStamp()
-                    self.count += 1
-                    self.printed = True
-                    self.ShowPO()
-                    self.t1 = 0
+            if self.t1 >= self.Delay2Print:
+                self.CheckStamp()
+                self.count += 1
+                self.printed = True
+                self.ShowPO()
+                self.t1 = 0
+        else:
+            self.t1 = 0
         if self.t2 > 0:
             self.ui.Status.setText(str(float(self.t2/10)))
         else:
@@ -233,7 +235,10 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.MaxWe.setText(str(self.maxwe))
 
     def closeEvent(self, event = None):
-        self.scale.stop()
+        try:
+            self.scale.stop()
+        except:
+            pass
         os.system('taskkill /F /IM EXCEL.exe')
         file_name =  os.path.basename(sys.argv[0])
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):

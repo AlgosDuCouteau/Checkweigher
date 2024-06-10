@@ -38,6 +38,8 @@ class GetScale(QtCore.QThread):
         try:
             self.scale = Instrument(self.portScale, 1)
             self.scale.serial.parity = serial.PARITY_EVEN
+            self.scale.serial.timeout  = 0.5
+            self.scale.clear_buffers_before_each_transaction = True
         except serial.serialutil.SerialException:
             self.in4('Không có kết nối tới cân')
             self._run_flag = False
@@ -57,7 +59,7 @@ class GetScale(QtCore.QThread):
         if self.scale.serial.is_open:
             try:
                 value = self.scale.read_registers(0, 2, 3)
-            except NoResponseError:
+            except:
                 logging.exception("Cant read from scale")
                 return
             if value[0] != 0:
@@ -72,7 +74,7 @@ class GetScale(QtCore.QThread):
                     except:
                         logging.exception("Cant write to scale")
                         return
-                    time.sleep(0.1)
+                    time.sleep(0.5)
                 self.tt += 1
                 if self.tt == 60:
                     dataR = 0
@@ -81,7 +83,7 @@ class GetScale(QtCore.QThread):
                     except:
                         logging.exception("Cant write to scale")
                         return
-                    time.sleep(0.1)
+                    time.sleep(0.5)
                     self.tt = 0
             else:
                 self.tt = 0
