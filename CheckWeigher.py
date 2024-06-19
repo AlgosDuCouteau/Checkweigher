@@ -28,7 +28,7 @@ class MainGUI(QtWidgets.QMainWindow):
         self.scale = GetScale(portScale=portScale, portArduino=portArduino, Ard2Convey=Ard2Convey)
         self.scale.start()
         self.ui.UpdateData.clicked.connect(self.UpdateData)
-        self.ui.CheckStamp.clicked.connect(self.CheckStamp)
+        self.ui.PrintStamp.clicked.connect(self.PrintStamp)
         self.ui.ArduinoCon.clicked.connect(self.ArduinoCon)
         self.ui.ZeroRet.clicked.connect(self.ZeroRet)
         self.ui.Calib.clicked.connect(self.Calib)
@@ -52,7 +52,8 @@ class MainGUI(QtWidgets.QMainWindow):
         self.qTimer4.timeout.connect(self.dataRfilter)
         self.qTimer4.start()
         self.count, self.index, self.k, self.t1, self.t2, self.maxwe, self.minwe,  self.dataR = 0, 0, 0, 0, 0, 0, 0, 0
-        self.printed = True, False
+        self.printed = False
+        self.t = 0
         self.seq = ['rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(255, 255, 0)', 'rgb(0, 255, 0)']
         self.filterlist = []
 
@@ -75,9 +76,9 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.ProductName.clear()
         self.ui.MaxWe.clear()
         self.ui.MinWe.clear()
-        self.ui.PO.clear()
-        self.ui.Remain.clear()
-        self.ui.Quan.clear()
+        self.ui.QuanBox.clear()
+        self.ui.QuanStampAuto.clear()
+        self.ui.QuanStampManual.clear()
         self.ui.Calendar.setChecked(0)
 
     def dataRfilter(self):
@@ -101,48 +102,36 @@ class MainGUI(QtWidgets.QMainWindow):
             self.ui.CurrentWe.display(float(self.dataR))
 
     def ShowPO(self):
-        self.ui.Quan.setText(str(int(self.count)))
+        self.ui.QuanBox.setText(str(int(self.count)))
+        self.ui.QuanStampAuto.setText(str(int(self.count)))
+        self.ui.QuanStampManual.setText(str(int(self.countManual)))
 
     def Compare(self):
         if len(self.ui.PdID.text()) <= 0 or self.maxwe == 0 or self.minwe == 0:
             return
-        if self.dataR < self.minwe/11.5*3 and not self.scale.full:
-            self.printed = False
-            self.t1 = 0
-            self.t2 = 0
-            return
-        if not self.printed and \
-            ((self.dataR+abs(12-self.Quan2Print)*(self.maxwe-self.minwe) < self.maxwe and self.dataR+abs(12-self.Quan2Print)*(self.maxwe-self.minwe) > self.minwe) or
-            (self.dataR <= self.maxwe and self.dataR >= self.minwe)):
-            if self.t1 < self.Delay2Print:
-                self.t1 += 1
-            if self.t1 >= self.Delay2Print:
-                self.CheckStamp()
-                self.count += 1
-                self.printed = True
-                self.ShowPO()
-                self.t1 = 0
-        else:
-            self.t1 = 0
-        if self.t2 > 0:
-            self.ui.Status.setText(str(float(self.t2/10)))
-        else:
+        if self.t == 0:
             self.ui.Status.setText("")
-        if self.dataR <= self.maxwe and self.dataR >= self.minwe and not self.scale.full:
-            if self.t2 < self.Delay2Print:
-                self.t2 += 1
-            if self.t2 >= self.Delay2Print:
+        if self.dataR <= self.maxwe and self.dataR >= self.minwe and not self.printed and not self.scale.full:
+            if self.t < self.Delay2Print:
+                self.t += 1
+                self.ui.Status.setText(str(float((self.Delay2Print-self.t)/10)))
+            if self.t >= self.Delay2Print:
+                self.t = 0
+                self.data_print = self.loaddata.data_print
+                self.print.printdata()
+                self.printed = True
                 self.scale.full = True
-                self.t2 = 0
+                self.count += 1
+                self.ShowPO()
         elif self.dataR < self.minwe/11.5:
+            self.t = 0
             if self.scale.full:
                 self.scale.full = False
-            self.printed = False
-            self.t2 = 0
+            if self.printed:
+                self.printed = False
         else:
-            if self.t2 != 0:
-                self.t2 = 0
-            return
+            if self.t != 0:
+                self.t = 0
     
     def ShowStt(self):
         if len(self.ui.PdID.text()) <= 0 or self.maxwe == 0 or self.minwe == 0:
@@ -171,13 +160,15 @@ class MainGUI(QtWidgets.QMainWindow):
         self.loaddata.updatedata()
 
     @QtCore.pyqtSlot()
-    def CheckStamp(self):
+    def PrintStamp(self):
         if len(self.ui.PdID.text()) <= 0:
             self.in4(infor = 'Quét mã sản phẩm')
             self.ui.ProductID.setFocus()
             return
         self.data_print = self.loaddata.data_print
         self.print.printdata()
+        self.countManual += 1
+        self.ShowPO()
 
     @QtCore.pyqtSlot()
     def ArduinoCon(self):
@@ -217,6 +208,16 @@ class MainGUI(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def ProductID(self):
+        def add_newline_every_7_spaces(s):
+            blank_count = 0
+            result = ""
+            for char in s:
+                if char == " ":
+                    blank_count += 1
+                    if blank_count % 6 == 0:
+                        result += "\n"
+                result += char
+            return result
         pdid = self.ui.ProductID.text().strip().lower()
         self.resetdata()
         if not pdid:
@@ -226,11 +227,12 @@ class MainGUI(QtWidgets.QMainWindow):
             return self.in4(infor = 'Không có mã sản phẩm này')
         self.minwe, self.maxwe = 20.0, 24.0
         self.count = 0
+        self.countManual = 0
         self.ShowPO()
         self.ui.PdID.setText(pdid)
         self.ui.INTiD.setText(str(self.data['INT'].item()))
         self.ui.CATiD.setText(str(self.data['CAT'].item()))
-        self.ui.ProductName.setText(str(self.data['Name'].item()))
+        self.ui.ProductName.setText(add_newline_every_7_spaces(str(self.data['Name'].item())))
         self.ui.MinWe.setText(str(self.minwe))
         self.ui.MaxWe.setText(str(self.maxwe))
 

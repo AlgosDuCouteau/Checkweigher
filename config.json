@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/CheckWeigher.py"
+   "value": "D:/Trung/Project/Checkweigher/CheckWeigher.py"
   },
   {
    "optionDest": "onefile",
@@ -15,11 +15,11 @@
   },
   {
    "optionDest": "console",
-   "value": false
+   "value": true
   },
   {
    "optionDest": "icon_file",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/pic/logo.ico"
+   "value": "D:/Trung/Project/Checkweigher/pic/logo.ico"
   },
   {
    "optionDest": "clean_build",
@@ -54,52 +54,48 @@
    "value": false
   },
   {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/Function;Function/"
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/SubFunction;SubFunction/"
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/UI;UI/"
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/tab;tab/"
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/version.txt;."
-  },
-  {
    "optionDest": "hiddenimports",
    "value": "xlwings"
   },
   {
    "optionDest": "datas",
-   "value": "C:/Users/PC/Desktop/Trung/Ansell/Checkweigher/version.txt;."
+   "value": "D:/Trung/Project/Checkweigher/Function;Function/"
   },
   {
    "optionDest": "datas",
-   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/pyarrow;pyarrow/"
+   "value": "D:/Trung/Project/Checkweigher/SubFunction;SubFunction/"
   },
   {
    "optionDest": "datas",
-   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/serial;serial/"
+   "value": "D:/Trung/Project/Checkweigher/UI;UI/"
   },
   {
    "optionDest": "datas",
-   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/telemetrix;telemetrix/"
+   "value": "D:/Trung/Project/Checkweigher/tab;tab/"
   },
   {
    "optionDest": "datas",
-   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/minimalmodbus.py;."
+   "value": "D:/Trung/Project/Checkweigher/version.txt;."
   },
   {
    "optionDest": "datas",
-   "value": "E:/miniconda/envs/checkweigher/Lib/site-packages/xlsx2csv.py;."
+   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/pyarrow;pyarrow/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/serial;serial/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/telemetrix;telemetrix/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/minimalmodbus.py;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/xlsx2csv.py;."
   }
  ],
  "nonPyinstallerOptions": {
