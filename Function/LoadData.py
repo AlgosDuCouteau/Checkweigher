@@ -17,7 +17,7 @@ class LoadData():
     def loaddata(self) -> pl.DataFrame:
         self.MainWin.resetdata()
         data = pl.read_excel(source = self.fileData, sheet_name = 'Database', schema_overrides = {'Code Item': str},
-                             read_csv_options = {'has_header': True, 'infer_schema_length': None, 'columns': ['Code Item', 'Name', 'ProductOf', 'Quantity', 'CAT', 'INT', 'Size', 'Type', 'Mã 1', 'Mã vạch thùng đầu', 'Mã vạch thùng đuôi', 'Mã vạch nhỏ']}, 
+                             read_csv_options = {'has_header': True, 'infer_schema_length': None, 'columns': ['Code Item', 'Name', 'ProductOf', 'Quantity thùng', 'CAT', 'INT', 'Size', 'Type', 'Mã 1', 'Mã vạch thùng đầu', 'Mã vạch thùng đuôi', 'Mã vạch nhỏ', 'Đơn vị thùng']}, 
                              xlsx2csv_options = {'skip_empty_lines': True, 'skip_hidden_rows': False})
         data_print = pl.read_excel(source = self.fileData, sheet_name = 'Layouts',
                              read_csv_options = {'has_header': True, 'infer_schema_length': None}, xlsx2csv_options = {'skip_empty_lines': True, 'skip_hidden_rows': False})
@@ -27,7 +27,7 @@ class LoadData():
         os.system('taskkill /f /IM EXCEL.exe')
         copyfile(self.fileUpdatePrint, self.filePrint)
         data_update = pl.read_excel(source = self.fileUpdateData, sheet_name = 'Sheet1', schema_overrides = {'Code Item': str},
-                             read_csv_options = {'has_header': True, 'infer_schema_length': None, 'columns': ['Code Item', 'Name', 'ProductOf', 'Quantity', 'CAT', 'INT', 'Size', 'Type', 'Mã 1', 'Mã vạch thùng đầu', 'Mã vạch thùng đuôi', 'Mã vạch nhỏ']}, 
+                             read_csv_options = {'has_header': True, 'infer_schema_length': None, 'columns': ['Code Item', 'Name', 'ProductOf', 'Quantity thùng', 'CAT', 'INT', 'Size', 'Type', 'Mã 1', 'Mã vạch thùng đầu', 'Mã vạch thùng đuôi', 'Mã vạch nhỏ', 'Đơn vị thùng']}, 
                              xlsx2csv_options = {'skip_empty_lines': True, 'skip_hidden_rows': False})
         data_update = data_update.filter(pl.all_horizontal(pl.col('Code Item').is_not_null()))
         data_update.unique(subset = ['Code Item'])
