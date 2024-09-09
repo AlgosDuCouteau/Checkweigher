@@ -43,10 +43,10 @@ class Print():
             mo = self.moa[18]
         else:
             mo = self.moa[int(self.MainWin.ui.MachineID.currentText())-1]
-        info = dte+mo+str(shift)+data['Mã 1'].item()
+        info = dte+mo+str(shift)+data['Ma_1'].item()
         year_month = ymdn[:-3].rstrip()
-        lot = ymdn[2]+ymdn[3]+ymdn[5]+ymdn[6]+data['Mã 1'].item()
-        layouts = data_print.filter(pl.col('Types')==data['Type'].item())
+        lot = ymdn[2]+ymdn[3]+ymdn[5]+ymdn[6]+data['Ma_1'].item()
+        layouts = data_print.filter(pl.col('Types')==data['Dinh_dang_Tem_Thung'].item())
         layouts = layouts[[s.name for s in layouts if not (s.null_count() > 0)]]
         return data, layouts, info, year_month, lot
     
@@ -61,34 +61,34 @@ class Print():
         os.system('taskkill /f /IM EXCEL.exe')
         with xw.App(visible=False) as app:
             wb = xw.Book(self.filePrint)
-            ws = wb.sheets[data['Type'].item()]
+            ws = wb.sheets[data['Dinh_dang_Tem_Thung'].item()]
             ws[layout['info'].item()].value = info
             ws[layout['int'].item()].value = data['INT'].item()
             ws[layout['lot'].item()].value = lot
             ws[layout['name'].item()].value = data['Name'].item()
             ws[layout['year_month'].item()].value = year_month
-            ws[layout['quantity'].item()].value = str(int(data['Quantity thùng'].item()))+' '+data['Đơn vị thùng'].item()
+            ws[layout['quantity'].item()].value = str(int(data['Quantity_thung'].item()))+' '+data['Don_vi_thung'].item()
             ws[layout['cat'].item()].value = data['CAT'].item()
             ws[layout['size'].item()].value = data['Size'].item()
             ws[layout['product_of'].item()].value = data['ProductOf'].item()
-            barcode = IDAutomation_Uni_C128(self.removespc(data['Mã vạch thùng đầu'].item()+lot+data['Mã vạch thùng đuôi'].item()))
+            barcode = IDAutomation_Uni_C128(self.removespc(data['Ma_vach_thung_dau'].item()+lot+data['Ma_vach_thung_duoi'].item()))
             ws[layout['barcode'].item()].value = barcode
             barcode = ''
-            ws[layout['code'].item()].value = data['Mã vạch thùng đầu'].item()+lot+data['Mã vạch thùng đuôi'].item()
+            ws[layout['code'].item()].value = data['Ma_vach_thung_dau'].item()+lot+data['Ma_vach_thung_duoi'].item()
             if layout.width > 12:
                 if layout['Types'].item() == 'TemThung2MaVachKoSo':
-                    ws[layout['cat_code'].item()].value = '('+str(int(data['Quantity thùng'].item()))+') '+data['CAT'].item()
+                    ws[layout['cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['CAT'].item()
                     barcode = IDAutomation_Uni_C39(self.removespc(data['CAT'].item()))
                     ws[layout['cat_barcode'].item()].value = barcode
                     barcode = ''
                 elif layout['Types'].item() == 'TemThung2MaVachCoSo':
-                    ws[layout['quan_cat_code'].item()].value = '('+str(int(data['Quantity thùng'].item()))+') '+data['CAT'].item()
-                    barcode = IDAutomation_Uni_C39(self.removespc(str(int(data['Quantity thùng'].item()))+' '+data['CAT'].item()))
+                    ws[layout['quan_cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['CAT'].item()
+                    barcode = IDAutomation_Uni_C39(self.removespc(str(int(data['Quantity_thung'].item()))+' '+data['CAT'].item()))
                     ws[layout['quan_cat_barcode'].item()].value = barcode
                     barcode = ''
                 elif layout['Types'].item() == 'TemThung2MaVachMoi':
-                    ws[layout['quan_cat_code'].item()].value = '('+str(int(data['Quantity thùng'].item()))+') '+data['Mã vạch nhỏ'].item()
-                    barcode = IDAutomation_Uni_C39(self.removespc(str(int(data['Quantity thùng'].item()))+' '+data['Mã vạch nhỏ'].item()))
+                    ws[layout['quan_cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['Ma_vach_nho'].item()
+                    barcode = IDAutomation_Uni_C39(self.removespc(str(int(data['Quantity_thung'].item()))+' '+data['Ma_vach_nho'].item()))
                     ws[layout['quan_cat_barcode'].item()].value = barcode
                     barcode = ''
                     ws[layout['int1'].item()].value = data['INT'].item()
@@ -99,7 +99,7 @@ class Print():
 
     def printdata(self):
         data, data_print = self.loaddata()
-        if data['Type'].item() == 'OEM':
+        if data['Dinh_dang_Tem_Thung'].item() == 'OEM':
             return
         data, layouts, info, year_month, lot = self.essentialdata(data, data_print)
         if layouts.height==0:

@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "D:/Trung/Project/Checkweigher/CheckWeigher.py"
+   "value": "D:/Trung/Checkweigher/CheckWeigher.py"
   },
   {
    "optionDest": "onefile",
@@ -19,7 +19,7 @@
   },
   {
    "optionDest": "icon_file",
-   "value": "D:/Trung/Project/Checkweigher/pic/logo.ico"
+   "value": "D:/Trung/Checkweigher/pic/logo.ico"
   },
   {
    "optionDest": "clean_build",
@@ -59,43 +59,43 @@
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/Function;Function/"
+   "value": "D:/Trung/Checkweigher/Function;Function/"
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/SubFunction;SubFunction/"
+   "value": "D:/Trung/Checkweigher/SubFunction;SubFunction/"
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/UI;UI/"
+   "value": "D:/Trung/Checkweigher/UI;UI/"
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/tab;tab/"
+   "value": "D:/Trung/Checkweigher/tab;tab/"
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/version.txt;."
+   "value": "D:/Trung/Checkweigher/version.txt;."
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/pyarrow;pyarrow/"
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/pyarrow;pyarrow/"
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/serial;serial/"
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/serial;serial/"
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/telemetrix;telemetrix/"
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/telemetrix;telemetrix/"
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/minimalmodbus.py;."
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/minimalmodbus.py;."
   },
   {
    "optionDest": "datas",
-   "value": "D:/Trung/Project/Checkweigher/.venv/Lib/site-packages/xlsx2csv.py;."
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/xlsx2csv.py;."
   }
  ],
  "nonPyinstallerOptions": {

@@ -1,13 +1,45 @@
-pyqt5 == 5.15.4
-polars == 0.19.3
-pandas == 1.4.0
-xlsx2csv == 0.8.1
-minimalmodbus == 2.0.1
-telemetrix == 1.35
-openpyxl == 3.0.7
-numpy == 1.23.5
-xlsxwriter == 3.0.3
-xlwings == 0.27.15
-pyarrow == 13.0.0
-mako == 1.2.4
-auto-py-to-exe == 2.41
+altgraph==0.17.4
+async-timeout==4.0.3
+auto-py-to-exe==2.41.0
+bleak==0.22.2
+bleak-winrt==1.2.0
+bottle==0.13.1
+bottle-websocket==0.2.9
+cffi==1.17.1
+Eel==0.17.0
+et-xmlfile==1.1.0
+future==1.0.0
+gevent==24.2.1
+gevent-websocket==0.10.1
+greenlet==3.0.3
+Mako==1.2.4
+MarkupSafe==2.1.5
+minimalmodbus==2.0.1
+numpy==1.23.5
+openpyxl==3.0.7
+packaging==24.1
+pandas==1.4.0
+pefile==2024.8.26
+polars==1.6.0
+pyarrow==13.0.0
+pycparser==2.22
+pyinstaller==6.10.0
+pyinstaller-hooks-contrib==2024.8
+pyparsing==3.1.4
+PyQt5==5.15.11
+PyQt5-Qt5==5.15.2
+PyQt5_sip==12.15.0
+pyserial==3.5
+python-dateutil==2.9.0.post0
+pytz==2024.1
+pywin32==306
+pywin32-ctypes==0.2.3
+six==1.16.0
+telemetrix==1.35
+typing_extensions==4.12.2
+whichcraft==0.6.1
+xlsx2csv==0.8.1
+XlsxWriter==3.0.3
+xlwings==0.27.15
+zope.event==5.0
+zope.interface==7.0.3

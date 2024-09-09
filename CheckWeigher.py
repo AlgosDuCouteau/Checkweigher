@@ -4,6 +4,8 @@ from UI import Ui_CheckWeigher
 from tab import *
 from Function import *
 
+print(pl.__version__)
+
 logging.basicConfig(filename="errors.txt",
                     format='\n%(asctime)s %(message)s',
                     filemode='a')
@@ -222,19 +224,23 @@ class MainGUI(QtWidgets.QMainWindow):
         self.resetdata()
         if not pdid:
             return self.in4(infor = 'Quét mã sản phẩm')
-        self.data = self.loaddata.data.filter(pl.col('Code Item') == pdid)
+        self.data = self.loaddata.data.filter(pl.col('Code_Item') == pdid)
         if self.data.is_empty():
             return self.in4(infor = 'Không có mã sản phẩm này')
-        self.minwe, self.maxwe = 20.0, 24.0
-        self.count = 0
-        self.countManual = 0
-        self.ShowPO()
-        self.ui.PdID.setText(pdid)
-        self.ui.INTiD.setText(str(self.data['INT'].item()))
-        self.ui.CATiD.setText(str(self.data['CAT'].item()))
-        self.ui.ProductName.setText(add_newline_every_7_spaces(str(self.data['Name'].item())))
-        self.ui.MinWe.setText(str(self.minwe))
-        self.ui.MaxWe.setText(str(self.maxwe))
+        try:
+            self.ui.INTiD.setText(str(self.data['INT'].item()))
+            self.ui.CATiD.setText(str(self.data['CAT'].item()))
+            self.minwe, self.maxwe = 20.0, 24.0
+            self.count = 0
+            self.countManual = 0
+            self.ShowPO()
+            self.ui.PdID.setText(pdid)
+            self.ui.ProductName.setText(add_newline_every_7_spaces(str(self.data['Name'].item())))
+            self.ui.MinWe.setText(str(self.minwe))
+            self.ui.MaxWe.setText(str(self.maxwe))
+        except:
+            self.in4(infor = 'Lỗi dữ liệu, xem lại mã hàng này')
+            return
 
     def closeEvent(self, event = None):
         try:
