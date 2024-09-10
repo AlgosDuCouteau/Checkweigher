@@ -4,8 +4,6 @@ from UI import Ui_CheckWeigher
 from tab import *
 from Function import *
 
-print(pl.__version__)
-
 logging.basicConfig(filename="errors.txt",
                     format='\n%(asctime)s %(message)s',
                     filemode='a')

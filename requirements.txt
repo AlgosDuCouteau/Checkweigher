@@ -20,7 +20,7 @@ openpyxl==3.0.7
 packaging==24.1
 pandas==1.4.0
 pefile==2024.8.26
-polars==1.6.0
+polars-lts-cpu==1.6.0
 pyarrow==13.0.0
 pycparser==2.22
 pyinstaller==6.10.0

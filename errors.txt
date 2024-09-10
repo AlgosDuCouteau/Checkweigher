@@ -780,3 +780,17 @@ Traceback (most recent call last):
   File "d:\Trung\Checkweigher\.venv\lib\site-packages\serial\serialwin32.py", line 64, in open
     raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
 serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+
+2024-09-09 15:28:45,309 Failed
+Traceback (most recent call last):
+  File "D:\Trung\Checkweigher\Function\Scale.py", line 39, in openPort
+    self.scale = Instrument(self.portScale, 1)
+  File "d:\Trung\Checkweigher\.venv\lib\site-packages\minimalmodbus.py", line 220, in __init__
+    self.serial = _serialports[port] = serial.Serial(
+  File "d:\Trung\Checkweigher\.venv\lib\site-packages\serial\serialwin32.py", line 33, in __init__
+    super(Serial, self).__init__(*args, **kwargs)
+  File "d:\Trung\Checkweigher\.venv\lib\site-packages\serial\serialutil.py", line 244, in __init__
+    self.open()
+  File "d:\Trung\Checkweigher\.venv\lib\site-packages\serial\serialwin32.py", line 64, in open
+    raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
+serial.serialutil.SerialException: could not open port 'COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
