@@ -29,6 +29,7 @@ class MainGUI(QtWidgets.QMainWindow):
         self.scale.start()
         self.ui.UpdateData.clicked.connect(self.UpdateData)
         self.ui.PrintStamp.clicked.connect(self.PrintStamp)
+        self.ui.ChangePd.clicked.connect(self.ChangePd)
         self.ui.ArduinoCon.clicked.connect(self.ArduinoCon)
         self.ui.ZeroRet.clicked.connect(self.ZeroRet)
         self.ui.Calib.clicked.connect(self.Calib)
@@ -169,6 +170,11 @@ class MainGUI(QtWidgets.QMainWindow):
         self.print.printdata()
         self.countManual += 1
         self.ShowPO()
+
+    @QtCore.pyqtSlot()
+    def ChangePd(self):
+        self.changepd = ChangePd(self)
+        self.shownChangePd = False
 
     @QtCore.pyqtSlot()
     def ArduinoCon(self):

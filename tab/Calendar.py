@@ -8,20 +8,16 @@ class Calendar(QtWidgets.QWidget):
         self.ui = Ui_Calendar()
         self.ui.setupUi(self.Calen)
         self.MainWin = MainWin
-        self.qTimer = QtCore.QTimer()
-        self.qTimer.setInterval(10)
-        self.qTimer.timeout.connect(self.Show_Hide)
-        self.qTimer.start()
+        self.Show_Hide()
         self.ui.Confirm.clicked.connect(self.Confirm)
         self.i = 0
 
     def Show_Hide(self):
-        if self.MainWin.ui.Calendar.isChecked() == 1 and self.i == 0:
+        if self.MainWin.ui.Calendar.isChecked():
             self.Calen.show()
-            self.MainWin.ui.Calendar.setDisabled(1)
-        elif self.MainWin.ui.Calendar.isChecked() == 0:
-            self.MainWin.ui.Calendar.setDisabled(0)
+        else:
             self.MainWin.ui.DD_MM_YY.setText('')
+            self.Calen.close()
 
     def Confirm(self):
         self.i = 1

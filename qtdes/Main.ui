@@ -388,31 +388,6 @@ khối lượng sản phẩm</string>
      <pixmap resource="pic.qrc">:/newPrefix/pic/logo.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="Name">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>961</width>
-      <height>111</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>16</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>KIỂM TRA KHỐI LƯỢNG
-VÀ IN TEM TỰ ĐỘNG</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
    <widget class="QPushButton" name="UpdateData">
     <property name="geometry">
      <rect>
@@ -1071,9 +1046,33 @@ thủ công</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QPushButton" name="ChangePd">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>10</y>
+      <width>111</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>16</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(170, 170, 255);</string>
+    </property>
+    <property name="text">
+     <string>Báo đổi
+sản phẩm</string>
+    </property>
+   </widget>
    <zorder>label_5</zorder>
    <zorder>label_4</zorder>
-   <zorder>Name</zorder>
    <zorder>Calib</zorder>
    <zorder>MachineID</zorder>
    <zorder>ZeroRet</zorder>
@@ -1105,6 +1104,7 @@ thủ công</string>
    <zorder>QuanStampAutoUnit</zorder>
    <zorder>QuanStampAutoInfo</zorder>
    <zorder>QuanStampAuto</zorder>
+   <zorder>ChangePd</zorder>
   </widget>
   <action name="PrintManu">
    <property name="text">
