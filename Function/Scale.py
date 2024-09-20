@@ -8,18 +8,21 @@ logging.basicConfig(filename="errors.txt",
                     filemode='a')
 
 class GetScale(QtCore.QThread):
-    def __init__(self, portScale: str, portArduino: str, Ard2Convey: int, parent = None):
+    def __init__(self, portScale: str, portArduino: str, Ard2Convey: int, Ard2Light: int, parent = None):
         super().__init__(parent)
         self._run_flag = True
         self.cps = False
         self.full = False
         self.zeroret = False
+        self.light = False
+        self.light_on = False
         self.portScale = portScale
         self.portArduino = portArduino
         self.Ard2Convey = Ard2Convey
+        self.Ard2Light = Ard2Light
         self.dataR = 0
         self.tt = 0
-        self.openPort()
+        # self.openPort()
 
     def in4(self, infor:str, title = 'Lỗi'):
         msg = QtWidgets.QMessageBox()
@@ -47,7 +50,9 @@ class GetScale(QtCore.QThread):
         try:
             self.board = telemetrix.Telemetrix(com_port = self.portArduino, arduino_wait = 6)
             self.board.set_pin_mode_digital_output(self.Ard2Convey)
+            self.board.set_pin_mode_digital_output(self.Ard2Light)
             self.board.digital_write(self.Ard2Convey, 0)
+            self.board.digital_write(self.Ard2Light, 0)
         except serial.serialutil.SerialException:
             self.in4('Không có kết nối tới băng tải')
             self._run_flag = False
@@ -123,11 +128,35 @@ class GetScale(QtCore.QThread):
                     self.openPort()
                     return
 
+    def runLight(self):
+        if self.light:
+            if not self.light_on:
+                try:
+                    self.board.digital_write(self.Ard2Light, 1)
+                    self.light_on = True
+                except:
+                    logging.exception("Cant write to arduino")
+                    self.board.shutdown()
+                    self.scale.serial.close()
+                    self.openPort()
+                    return
+        elif not self.light and self.light_on:
+            try:
+                self.board.digital_write(self.Ard2Light, 0)
+                self.light_on = False
+            except:
+                logging.exception("Cant write to arduino")
+                self.board.shutdown()
+                self.scale.serial.close()
+                self.openPort()
+                return
+
     def run(self):
         while self._run_flag:
             self.readScale()
             self.calibScale()
             self.runConvey()
+            self.runLight()
             time.sleep(0.1)
     
     def stop(self):

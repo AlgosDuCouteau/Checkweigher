@@ -36,8 +36,8 @@ class GetConfig(object):
             for i in range(len(contents)):
                 contents[i] = contents[i].strip().replace(" ", "")
                 portall.append(contents[i].rsplit(':', 1)[1])
-        return {'portScale': portall[0], 'portArduino': portall[1], 'GdriveData': portall[2]+ ":/", 'GdrivePrint': portall[2]+ ":/", 'Ard2Convey': int(portall[3]),
-                'Delay2Print': float(portall[6]), 'Quan2Print': int(portall[8])}
+        return {'portScale': portall[0], 'portArduino': portall[1], 'Ard2Convey': int(portall[2]), 'Ard2Light': int(portall[3]),
+                'GdriveData': portall[4]+ ":/", 'GdrivePrint': portall[4]+ ":/", 'Delay2Print': float(portall[5]), 'Quan2Print': int(portall[6])}
     
 if __name__ == "__main__":
     data = GetConfig()

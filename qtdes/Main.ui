@@ -1106,9 +1106,34 @@ sản phẩm</string>
    <zorder>QuanStampAuto</zorder>
    <zorder>ChangePd</zorder>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>961</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuConfig">
+    <property name="title">
+     <string>Cài đặt</string>
+    </property>
+    <addaction name="actionConfig"/>
+   </widget>
+   <addaction name="menuConfig"/>
+  </widget>
   <action name="PrintManu">
    <property name="text">
     <string>In</string>
+   </property>
+  </action>
+  <action name="actionConfig">
+   <property name="text">
+    <string>Thông số</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

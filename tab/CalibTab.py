@@ -5,6 +5,7 @@ class CalibTab(QtWidgets.QWidget):
     def __init__(self, MainWin, parent = None):
         super().__init__(parent)
         self.CalibTab = QtWidgets.QWidget()
+        self.CalibTab.setWindowFlags(self.CalibTab.windowFlags() & ~(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMinMaxButtonsHint))
         self.ui = Ui_CalibTab()
         self.ui.setupUi(self.CalibTab)
         self.ui.Confirm.setText('Xác nhận')
@@ -74,16 +75,16 @@ class CalibTab(QtWidgets.QWidget):
         self.ui.Arrow2.hide()
 
     def ConfirmAll(self):
-        self.CalibTab.destroy()
+        self.CalibTab.close()
         self.qTimer1.stop()
         self.MainWin.maxwe = round(float(self.maxw), 2)
         self.MainWin.minwe = round(float(self.minw), 2)
         self.MainWin.ui.MinWe.setText(str(self.MainWin.minwe))
         self.MainWin.ui.MaxWe.setText(str(self.MainWin.maxwe))
+        self.MainWin.show()
         self.MainWin.qTimer1.start()
         self.MainWin.qTimer2.start()
         self.MainWin.qTimer3.start()
-        self.MainWin.show()
         self.MainWin.ui.ProductID.setFocus()
     
     # def UpdateData(self):

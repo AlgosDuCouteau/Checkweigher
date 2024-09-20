@@ -5,6 +5,7 @@ class Calendar(QtWidgets.QWidget):
     def __init__(self, MainWin, parent = None):
         super().__init__(parent)
         self.Calen = QtWidgets.QWidget()
+        self.Calen.setWindowFlags(self.Calen.windowFlags() & ~(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMinMaxButtonsHint))
         self.ui = Ui_Calendar()
         self.ui.setupUi(self.Calen)
         self.MainWin = MainWin

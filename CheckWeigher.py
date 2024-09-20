@@ -18,15 +18,17 @@ class MainGUI(QtWidgets.QMainWindow):
         filePrint = data['filePrint']
         fileUpdateData = data['GdriveData']
         fileUpdatePrint = data['GdrivePrint']
-        portScale = data['portScale']
-        portArduino = data['portArduino']
-        Ard2Convey = data['Ard2Convey']
+        self.portScale = data['portScale']
+        self.portArduino = data['portArduino']
+        self.Ard2Convey = data['Ard2Convey']
+        self.Ard2Light = data['Ard2Light']
         self.Delay2Print = data['Delay2Print']
         self.Quan2Print = data['Quan2Print']
         self.loaddata = LoadData(self, fileData=fileData, filePrint=filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
         self.print = Print(self, filePrint=filePrint)
-        self.scale = GetScale(portScale=portScale, portArduino=portArduino, Ard2Convey=Ard2Convey)
-        self.scale.start()
+        self.scale = GetScale(portScale=self.portScale, portArduino=self.portArduino, Ard2Convey=self.Ard2Convey, Ard2Light=self.Ard2Light)
+        # self.scale.start()
+        self.ui.actionConfig.triggered.connect(self.setConfig)
         self.ui.UpdateData.clicked.connect(self.UpdateData)
         self.ui.PrintStamp.clicked.connect(self.PrintStamp)
         self.ui.ChangePd.clicked.connect(self.ChangePd)
@@ -157,6 +159,11 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.Status.setStyleSheet(color)
 
     @QtCore.pyqtSlot()
+    def setConfig(self):
+        print('set config')
+        self.setconfig = SetConfig(self)
+
+    @QtCore.pyqtSlot()
     def UpdateData(self):
         self.loaddata.updatedata()
 
@@ -173,8 +180,18 @@ class MainGUI(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def ChangePd(self):
+        if len(self.ui.PdID.text()) <= 0:
+            self.in4(infor = 'Quét mã sản phẩm')
+            self.ui.ProductID.setFocus()
+            return
+        if not self.scale._run_flag:
+            self.in4('Kiểm tra kết nối')
+            return
+        self.scale.light = True
+        self.qTimer1.stop()
+        self.qTimer2.stop()
+        self.qTimer3.stop()
         self.changepd = ChangePd(self)
-        self.shownChangePd = False
 
     @QtCore.pyqtSlot()
     def ArduinoCon(self):
