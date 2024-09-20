@@ -43,7 +43,7 @@ class ChangePd(QtWidgets.QWidget):
         self.timer.stop()
         self.MainWin.show()
         self.MainWin.scale.light = False
-        self.MainWin.qTimer1.start()
         self.MainWin.qTimer2.start()
         self.MainWin.qTimer3.start()
+        self.MainWin.qTimer4.start()
         self.ChangePD.close()

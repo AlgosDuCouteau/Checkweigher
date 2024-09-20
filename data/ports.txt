@@ -1,7 +1,7 @@
-Weight scale to PC: COM3
+Weight scale to PC: COM5
 Arduino to PC: COM3
-Arduino to Conveyor: 4
-Arduino to Light: 3
+Arduino to Conveyor: 3
+Arduino to Light: 2
 Database: F
 Delay2Print(ms): 100
 Quan2Print: 12

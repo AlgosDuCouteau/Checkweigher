@@ -1116,6 +1116,14 @@ sản phẩm</string>
     </rect>
    </property>
    <widget class="QMenu" name="menuConfig">
+    <property name="geometry">
+     <rect>
+      <x>269</x>
+      <y>125</y>
+      <width>300</width>
+      <height>72</height>
+     </rect>
+    </property>
     <property name="title">
      <string>Cài đặt</string>
     </property>

@@ -1,12 +1,44 @@
-import sys, os, polars as pl, logging
+import sys, os, polars as pl, logging, inspect, traceback
 from PyQt5 import QtWidgets, QtCore
 from UI import Ui_CheckWeigher
 from tab import *
 from Function import *
 
+# Helper function to get current file name and line number
+def get_file_and_line():
+    frame = inspect.currentframe().f_back
+    return f"{os.path.basename(frame.f_code.co_filename)}:{frame.f_lineno}"
+
+# Configure logging to write errors to errors.txt in the same directory as CheckWeigher.py
 logging.basicConfig(filename="errors.txt",
                     format='\n%(asctime)s %(message)s',
                     filemode='a')
+
+class WorkerSignals(QtCore.QObject):
+    finished = QtCore.pyqtSignal()
+    error = QtCore.pyqtSignal(tuple)
+    result = QtCore.pyqtSignal(object)
+
+class Worker(QtCore.QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()
+
+    @QtCore.pyqtSlot()
+    def run(self):
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except:
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.result.emit(result)
+        finally:
+            self.signals.finished.emit()
 
 class MainGUI(QtWidgets.QMainWindow):
     def __init__(self, data: dict, parent=None):
@@ -14,8 +46,12 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui = Ui_CheckWeigher()
         self.ui.setupUi(self)
         self.show()
+        self.threadpool = QtCore.QThreadPool()
+        print(f"Multithreading with maximum {self.threadpool.maxThreadCount()} threads")
+        
+        # Initialize data and configurations
         fileData = data['fileData']
-        filePrint = data['filePrint']
+        self.filePrint = data['filePrint']
         fileUpdateData = data['GdriveData']
         fileUpdatePrint = data['GdrivePrint']
         self.portScale = data['portScale']
@@ -24,10 +60,20 @@ class MainGUI(QtWidgets.QMainWindow):
         self.Ard2Light = data['Ard2Light']
         self.Delay2Print = data['Delay2Print']
         self.Quan2Print = data['Quan2Print']
-        self.loaddata = LoadData(self, fileData=fileData, filePrint=filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
-        self.print = Print(self, filePrint=filePrint)
+        
+        # Initialize components
+        self.loadData = LoadData(self, fileData=fileData, filePrint=self.filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
+        self.fileProcess = FileProcess(self, filePrint=self.filePrint)
         self.scale = GetScale(portScale=self.portScale, portArduino=self.portArduino, Ard2Convey=self.Ard2Convey, Ard2Light=self.Ard2Light)
-        # self.scale.start()
+        self.scale.openPort()
+        if self.scale._run_flag:
+            # Start scale reading and Arduino control workers
+            self.start_scale_worker()
+            self.start_arduino_worker()
+        else:
+            self.in4(infor = 'Không thể kết nối đến cân!')
+        
+        # Connect UI elements to their respective functions
         self.ui.actionConfig.triggered.connect(self.setConfig)
         self.ui.UpdateData.clicked.connect(self.UpdateData)
         self.ui.PrintStamp.clicked.connect(self.PrintStamp)
@@ -38,29 +84,47 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.Calendar.clicked.connect(self.Calendar)
         self.ui.ProductID.returnPressed.connect(self.ProductID)
         self.ui.ProductID.setFocus()
-        self.qTimer1 = QtCore.QTimer()
-        self.qTimer1.setInterval(100)
-        self.qTimer1.timeout.connect(self.ShowDataR)
-        self.qTimer1.start()
-        self.qTimer2 = QtCore.QTimer()
-        self.qTimer2.setInterval(100)
-        self.qTimer2.timeout.connect(self.ShowStt)
-        self.qTimer2.start()
-        self.qTimer3 = QtCore.QTimer()
-        self.qTimer3.setInterval(100)
-        self.qTimer3.timeout.connect(self.Compare)
-        self.qTimer3.start()
-        self.qTimer4 = QtCore.QTimer()
-        self.qTimer4.setInterval(200)
-        self.qTimer4.timeout.connect(self.dataRfilter)
-        self.qTimer4.start()
+        
+        # Set up timers for various periodic tasks
+        self.setupTimers()
+        
+        # Initialize variables
         self.count, self.index, self.k, self.t1, self.t2, self.maxwe, self.minwe,  self.dataR = 0, 0, 0, 0, 0, 0, 0, 0
         self.printed = False
         self.t = 0
         self.seq = ['rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(255, 255, 0)', 'rgb(0, 255, 0)']
         self.filterlist = []
 
+    def start_scale_worker(self):
+        worker = Worker(self.scale.read_scale_continuously)
+        worker.signals.result.connect(self.ShowDataR)
+        self.threadpool.start(worker)
+
+    def start_arduino_worker(self):
+        worker = Worker(self.scale.control_arduino_continuously)
+        self.threadpool.start(worker)
+
+    def setupTimers(self):
+        # Timer for updating status display
+        self.qTimer2 = QtCore.QTimer()
+        self.qTimer2.setInterval(100)
+        self.qTimer2.timeout.connect(self.ShowStt)
+        self.qTimer2.start()
+        
+        # Timer for comparing weight and triggering actions
+        self.qTimer3 = QtCore.QTimer()
+        self.qTimer3.setInterval(100)
+        self.qTimer3.timeout.connect(self.Compare)
+        self.qTimer3.start()
+        
+        # Timer for filtering weight data
+        self.qTimer4 = QtCore.QTimer()
+        self.qTimer4.setInterval(200)
+        self.qTimer4.timeout.connect(self.dataRfilter)
+        self.qTimer4.start()
+
     def in4(self, infor:str, title = 'Lỗi'):
+        # Display an information or error message box
         msg = QtWidgets.QMessageBox()
         msg.setWindowTitle(title)
         msg.setText(infor)
@@ -72,6 +136,7 @@ class MainGUI(QtWidgets.QMainWindow):
         return
 
     def resetdata(self):
+        # Clear all input fields and reset display
         self.ui.ProductID.clear()
         self.ui.PdID.clear()
         self.ui.CATiD.clear()
@@ -85,6 +150,7 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.Calendar.setChecked(0)
 
     def dataRfilter(self):
+        # Filter weight data to detect sudden changes
         if len(self.ui.PdID.text()) <= 0 or self.maxwe == 0 or self.minwe == 0:
             return
         if self.dataR != 0 and self.maxwe != 0 and self.dataR < self.maxwe:
@@ -96,20 +162,18 @@ class MainGUI(QtWidgets.QMainWindow):
                 else:
                     self.filterlist = []
 
-    def ShowDataR(self):
-        if not self.scale._run_flag:
-            return
-        self.dataR = self.scale.dataR
-        if self.isHidden() == 0:
-            self.dataR = self.scale.dataR
-            self.ui.CurrentWe.display(float(self.dataR))
+    def ShowDataR(self, value):
+        self.dataR = value
+        self.ui.CurrentWe.display(float(self.dataR))
 
     def ShowPO(self):
+        # Update quantity displays
         self.ui.QuanBox.setText(str(int(self.count)))
         self.ui.QuanStampAuto.setText(str(int(self.count)))
         self.ui.QuanStampManual.setText(str(int(self.countManual)))
 
     def Compare(self):
+        # Compare weight and trigger printing if within range
         if len(self.ui.PdID.text()) <= 0 or self.maxwe == 0 or self.minwe == 0:
             return
         if self.t == 0:
@@ -120,8 +184,7 @@ class MainGUI(QtWidgets.QMainWindow):
                 self.ui.Status.setText(str(float((self.Delay2Print-self.t)/10)))
             if self.t >= self.Delay2Print:
                 self.t = 0
-                self.data_print = self.loaddata.data_print
-                self.print.printdata()
+                self.fileProcess.printdata()
                 self.printed = True
                 self.scale.full = True
                 self.count += 1
@@ -137,6 +200,7 @@ class MainGUI(QtWidgets.QMainWindow):
                 self.t = 0
     
     def ShowStt(self):
+        # Update status display based on weight
         if len(self.ui.PdID.text()) <= 0 or self.maxwe == 0 or self.minwe == 0:
             return
         if self.dataR <= self.minwe/4 or self.dataR >= self.maxwe+self.minwe*3/4:
@@ -160,77 +224,103 @@ class MainGUI(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def setConfig(self):
-        print('set config')
-        self.setconfig = SetConfig(self)
+        # Open configuration window
+        self.setConfig = SetConfig(self)
 
     @QtCore.pyqtSlot()
     def UpdateData(self):
-        self.loaddata.updatedata()
+        # Update data from source
+        try:
+            self.loadData.updatedata()
+            self.in4(infor = 'Hoàn thành cập nhật', title = 'Thông tin')
+        except Exception as e:
+            self.in4(infor = 'Lỗi dữ liệu, không thể cập nhật!')
+            return
 
     @QtCore.pyqtSlot()
     def PrintStamp(self):
         if len(self.ui.PdID.text()) <= 0:
-            self.in4(infor = 'Quét mã sản phẩm')
+            self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
             return
-        self.data_print = self.loaddata.data_print
-        self.print.printdata()
-        self.countManual += 1
-        self.ShowPO()
+        if self.fileProcess.is_processing:
+            self.in4(infor = 'Đang xử lý dữ liệu. Vui lòng đợi.', title = 'Thông tin')
+            return
+        worker = Worker(self.fileProcess.generateImage)
+        worker.signals.result.connect(self.on_image_generated)
+        worker.signals.error.connect(self.on_image_generation_error)
+        self.threadpool.start(worker)
+
+    def on_image_generated(self, imgFile):
+        if imgFile:
+            self.showStamp = ShowStamp(self, imgFile)
+        else:
+            self.in4(infor = 'Không thể tạo hình ảnh', title = 'Lỗi')
+
+    def on_image_generation_error(self, error):
+        error_type, error_instance, traceback = error
+        self.in4(infor = f'Lỗi khi tạo hình ảnh: {error_instance}')
 
     @QtCore.pyqtSlot()
     def ChangePd(self):
+        # Change product
         if len(self.ui.PdID.text()) <= 0:
-            self.in4(infor = 'Quét mã sản phẩm')
+            self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
             return
         if not self.scale._run_flag:
-            self.in4('Kiểm tra kết nối')
+            self.in4('Kiểm tra kết nối!')
             return
         self.scale.light = True
-        self.qTimer1.stop()
         self.qTimer2.stop()
         self.qTimer3.stop()
+        self.qTimer4.stop()
         self.changepd = ChangePd(self)
 
     @QtCore.pyqtSlot()
     def ArduinoCon(self):
+        # Reconnect to Arduino
         if not self.scale._run_flag:
-            self.in4('Kiểm tra kết nối')
+            self.in4('Kiểm tra kết nối!')
             return
         self.scale.scale.serial.close()
         self.scale.board.shutdown()
         self.scale.openPort()
+        self.scale.start()
 
     @QtCore.pyqtSlot()
     def ZeroRet(self):
+        # Reset scale to zero
         if not self.scale._run_flag:
-            self.in4('Kiểm tra kết nối')
+            self.in4('Kiểm tra kết nối!')
             return
         self.scale.zeroret = True
 
     @QtCore.pyqtSlot()
     def Calib(self):
+        # Open calibration window
         if len(self.ui.PdID.text()) <= 0:
-            self.in4(infor = 'Quét mã sản phẩm')
+            self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
             return
-        self.qTimer1.stop()
         self.qTimer2.stop()
         self.qTimer3.stop()
+        self.qTimer4.stop()
         self.calib = CalibTab(self)
 
     @QtCore.pyqtSlot()
     def Calendar(self):
+        # Open calendar window
         if len(self.ui.PdID.text()) <= 0:
             self.ui.Calendar.setChecked(0)
-            self.in4(infor = 'Quét mã sản phẩm')
+            self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
             return
         self.calendar = Calendar(self)
 
     @QtCore.pyqtSlot()
     def ProductID(self):
+        # Process product ID input
         def add_newline_every_7_spaces(s):
             blank_count = 0
             result = ""
@@ -244,8 +334,8 @@ class MainGUI(QtWidgets.QMainWindow):
         pdid = self.ui.ProductID.text().strip().lower()
         self.resetdata()
         if not pdid:
-            return self.in4(infor = 'Quét mã sản phẩm')
-        self.data = self.loaddata.data.filter(pl.col('Code_Item') == pdid)
+            return self.in4(infor = 'Quét mã sản phẩm!')
+        self.data = self.loadData.data.filter(pl.col('Code_Item') == pdid)
         if self.data.is_empty():
             return self.in4(infor = 'Không có mã sản phẩm này')
         try:
@@ -259,15 +349,18 @@ class MainGUI(QtWidgets.QMainWindow):
             self.ui.ProductName.setText(add_newline_every_7_spaces(str(self.data['Name'].item())))
             self.ui.MinWe.setText(str(self.minwe))
             self.ui.MaxWe.setText(str(self.maxwe))
-        except:
+        except Exception as e:
             self.in4(infor = 'Lỗi dữ liệu, xem lại mã hàng này')
             return
 
+        # Use a worker to append data
+        worker = Worker(self.fileProcess.appendData, self.data)
+        self.threadpool.start(worker)
+
     def closeEvent(self, event = None):
-        try:
+        # Handle application close event
+        if self.scale._run_flag:
             self.scale.stop()
-        except:
-            pass
         os.system('taskkill /F /IM EXCEL.exe')
         file_name =  os.path.basename(sys.argv[0])
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
@@ -281,6 +374,7 @@ if __name__ == "__main__":
         data = GetConfig()
         app = QtWidgets.QApplication(sys.argv)
         gui = MainGUI(data.config)
-    except:
-        logging.exception('Error')
+    except Exception as e:
+        # Check if this error has already been logged
+        logging.exception(f'Error initializing application at {get_file_and_line()}: {e}')
     sys.exit(app.exec_())

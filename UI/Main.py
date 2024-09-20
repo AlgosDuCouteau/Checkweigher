@@ -475,6 +475,7 @@ class Ui_CheckWeigher(object):
         self.menuBar.setGeometry(QtCore.QRect(0, 0, 961, 21))
         self.menuBar.setObjectName("menuBar")
         self.menuConfig = QtWidgets.QMenu(self.menuBar)
+        self.menuConfig.setGeometry(QtCore.QRect(269, 125, 300, 72))
         self.menuConfig.setObjectName("menuConfig")
         CheckWeigher.setMenuBar(self.menuBar)
         self.PrintManu = QtWidgets.QAction(CheckWeigher)
