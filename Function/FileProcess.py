@@ -52,7 +52,7 @@ class FileProcess(QtCore.QObject):
             return
 
         self.is_processing = True
-        pythoncom.CoInitialize()
+        
         try:
             if data['Dinh_dang_Tem_Thung'].item() == 'OEM':
                 self.printable = False
@@ -88,6 +88,7 @@ class FileProcess(QtCore.QObject):
             layouts = self.data_print.filter(pl.col('Types')==self.ws)
             layout = layouts[[s.name for s in layouts if not (s.null_count() > 0)]]
             os.system('taskkill /f /IM EXCEL.exe')
+            pythoncom.CoInitialize()
             with xw.App(visible=False) as app:
                 wb = xw.Book(self.filePrint)
                 ws = wb.sheets[self.ws]
@@ -121,9 +122,10 @@ class FileProcess(QtCore.QObject):
                         ws[layout['quan_cat_barcode'].item()].value = barcode
                         barcode = ''
                         ws[layout['int1'].item()].value = data['INT'].item()
-            wb.save()
-            wb.close()
+                wb.save()
+                wb.close()
         except Exception as e:
+            logging.error(f"{get_file_and_line()}: {traceback.format_exc()}")
             self.error.emit((type(e), str(e), traceback.format_exc()))
         finally:
             pythoncom.CoUninitialize()
