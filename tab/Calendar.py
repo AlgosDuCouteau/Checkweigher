@@ -24,4 +24,5 @@ class Calendar(QtWidgets.QWidget):
         self.i = 1
         self.Calen.close()
         self.MainWin.ui.Calendar.setEnabled(1)
+        self.MainWin.fileProcess.changeEvent = True
         self.MainWin.ui.DD_MM_YY.setText(str(self.ui.calendar.selectedDate().toString("yyyy-MM-dd")))

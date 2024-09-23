@@ -1,4 +1,4 @@
-import os, polars as pl, xlwings as xw, logging, inspect, sys, traceback, pythoncom, win32com.client, win32clipboard
+import os, polars as pl, xlwings as xw, logging, inspect, sys, traceback, pythoncom, pywintypes, win32com.client, win32clipboard
 from pathlib import Path
 from datetime import datetime, timedelta, date
 from SubFunction import IDAutomation_Uni_C128, IDAutomation_Uni_C39
@@ -36,7 +36,7 @@ class FileProcess(QtCore.QObject):
                     'J', 'K', 'L', 'M', 
                     'N', 'P', 'Q', 'R',
                     'S', 'T', 'U']
-        self.is_processing, self.printable = False, False
+        self.is_processing, self.printable, self.changeEvent = False, False, False
     
     def removeSpc(self, text):
         text = str(text)
@@ -44,15 +44,8 @@ class FileProcess(QtCore.QObject):
         for char in spc:
             text = text.replace(char, '')
         return str(text)
-    
-    @QtCore.pyqtSlot(object)
-    def appendData(self, data: pl.DataFrame):
-        if self.is_processing:
-            self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
-            return
 
-        self.is_processing = True
-        
+    def appendData(self, data: pl.DataFrame):
         try:
             if data['Dinh_dang_Tem_Thung'].item() == 'OEM':
                 self.printable = False
@@ -88,7 +81,6 @@ class FileProcess(QtCore.QObject):
             layouts = self.data_print.filter(pl.col('Types')==self.ws)
             layout = layouts[[s.name for s in layouts if not (s.null_count() > 0)]]
             os.system('taskkill /f /IM EXCEL.exe')
-            pythoncom.CoInitialize()
             with xw.App(visible=False) as app:
                 wb = xw.Book(self.filePrint)
                 ws = wb.sheets[self.ws]
@@ -126,15 +118,11 @@ class FileProcess(QtCore.QObject):
                 wb.close()
         except Exception as e:
             logging.error(f"{get_file_and_line()}: {traceback.format_exc()}")
-            self.error.emit((type(e), str(e), traceback.format_exc()))
         finally:
-            pythoncom.CoUninitialize()
-            self.is_processing = False
-            self.finished.emit()
             self.printable = True
             
     @QtCore.pyqtSlot()
-    def generateImage(self):
+    def generateImage(self, data):
         if self.is_processing:
             self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
             return None
@@ -142,9 +130,11 @@ class FileProcess(QtCore.QObject):
         self.is_processing = True
         pythoncom.CoInitialize()
         try:
+            if self.changeEvent:
+                self.appendData(data)
+                self.changeEvent = False
             if not self.printable:
                 return None
-
             # Check if the image already exists
             pdid = self.MainWin.ui.PdID.text()
             output_folder = os.path.join(resource_path(), 'cell_range_images')
@@ -152,7 +142,7 @@ class FileProcess(QtCore.QObject):
             
             if os.path.exists(imgFile):
                 return imgFile
-
+            
             # Get the range from data_print
             cell_range = self.data_print.filter(pl.col('Types')==self.ws)['range'].item()
 
@@ -215,23 +205,15 @@ class FileProcess(QtCore.QObject):
             self.is_processing = False
             self.finished.emit()
 
-    @QtCore.pyqtSlot()
     def printSheet(self):
-        if self.is_processing:
-            self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
-            return
-
-        self.is_processing = True
         try:
-            if not self.printable:
+            if not self.printable or self.is_processing or self.changeEvent:
                 return
             with xw.App(visible=False) as app:
                 wb = xw.Book(self.filePrint)
                 ws = wb.sheets[self.ws]
                 ws.api.PrintOut()
         except Exception as e:
-            self.error.emit((type(e), str(e), traceback.format_exc()))
-        finally:
-            self.is_processing = False
-            self.finished.emit()
+            logging.error(f"{get_file_and_line()}: {traceback.format_exc()}")
+            return
 

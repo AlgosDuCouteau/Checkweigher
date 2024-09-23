@@ -29,7 +29,7 @@ class GetConfig(object):
             file = self.getfilepath()
             port = self.readfileport(file['filePort'])
             file_final = file.copy()
-            file_final.pop('filePort')
+            # file_final.pop('filePort')
             file_final.update(port)
             file_final.update({'GdriveData': os.path.join(port['GdriveData'], 'My Drive/IN&PACKING.xlsm')})
             file_final.update({'GdrivePrint': os.path.join(port['GdrivePrint'], 'My Drive/in.xlsx')})

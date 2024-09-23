@@ -21,6 +21,8 @@ logging.basicConfig(filename=os.path.join(resource_path(), "errors.txt"),
                     filemode='a')
 
 class GetScale(QtCore.QObject):
+    data_ready = QtCore.pyqtSignal(float)  # New signal to emit scale readings
+
     def __init__(self, portScale: str, portArduino: str, Ard2Convey: int, Ard2Light: int, parent=None):
         super().__init__(parent)
         # Initialize flags and parameters for the scale and Arduino
@@ -158,17 +160,13 @@ class GetScale(QtCore.QObject):
                 self.openPort()  # Attempt to reopen ports
                 return
 
-    def read_scale_continuously(self):
+    def read_control_continuously(self):
         while self._run_flag:
             self.readScale()
             self.calibScale()  # Include calibration in the continuous reading loop
-            time.sleep(0.1)
-        return self.dataR  # Return the final value when the loop ends
-
-    def control_arduino_continuously(self):
-        while self._run_flag:
             self.runConvey()
             self.runLight()
+            self.data_ready.emit(self.dataR)  # Emit the current reading
             time.sleep(0.1)
 
     def stop(self):

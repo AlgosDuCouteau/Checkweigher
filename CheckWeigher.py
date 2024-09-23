@@ -1,4 +1,4 @@
-import sys, os, polars as pl, logging, inspect, traceback
+import sys, os, polars as pl, logging, inspect, traceback, time
 from PyQt5 import QtWidgets, QtCore
 from UI import Ui_CheckWeigher
 from tab import *
@@ -51,6 +51,7 @@ class MainGUI(QtWidgets.QMainWindow):
         
         # Initialize data and configurations
         fileData = data['fileData']
+        self.filePort = data['filePort']
         self.filePrint = data['filePrint']
         fileUpdateData = data['GdriveData']
         fileUpdatePrint = data['GdrivePrint']
@@ -65,18 +66,21 @@ class MainGUI(QtWidgets.QMainWindow):
         self.loadData = LoadData(self, fileData=fileData, filePrint=self.filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
         self.fileProcess = FileProcess(self, filePrint=self.filePrint)
         self.scale = GetScale(portScale=self.portScale, portArduino=self.portArduino, Ard2Convey=self.Ard2Convey, Ard2Light=self.Ard2Light)
+        t = time.time()
         self.scale.openPort()
+        print(time.time() - t)
         if self.scale._run_flag:
-            # Start scale reading and Arduino control workers
+            self.in4(infor = 'Kết nối thành công!', title = 'Thông tin')
             self.start_scale_worker()
-            self.start_arduino_worker()
         else:
             self.in4(infor = 'Không thể kết nối đến cân!')
         
         # Connect UI elements to their respective functions
+        self.ui.MachineID.setCurrentIndex(-1)
+        self.ui.MachineID.currentTextChanged.connect(lambda _: setattr(self.fileProcess, 'changeEvent', True))
         self.ui.actionConfig.triggered.connect(self.setConfig)
         self.ui.UpdateData.clicked.connect(self.UpdateData)
-        self.ui.PrintStamp.clicked.connect(self.PrintStamp)
+        self.ui.ShowStamp.clicked.connect(self.ShowStamp)
         self.ui.ChangePd.clicked.connect(self.ChangePd)
         self.ui.ArduinoCon.clicked.connect(self.ArduinoCon)
         self.ui.ZeroRet.clicked.connect(self.ZeroRet)
@@ -96,12 +100,8 @@ class MainGUI(QtWidgets.QMainWindow):
         self.filterlist = []
 
     def start_scale_worker(self):
-        worker = Worker(self.scale.read_scale_continuously)
-        worker.signals.result.connect(self.ShowDataR)
-        self.threadpool.start(worker)
-
-    def start_arduino_worker(self):
-        worker = Worker(self.scale.control_arduino_continuously)
+        self.scale.data_ready.connect(self.ShowDataR)  # Connect the signal to ShowDataR
+        worker = Worker(self.scale.read_control_continuously)
         self.threadpool.start(worker)
 
     def setupTimers(self):
@@ -146,7 +146,6 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.MinWe.clear()
         self.ui.QuanBox.clear()
         self.ui.QuanStampAuto.clear()
-        self.ui.QuanStampManual.clear()
         self.ui.Calendar.setChecked(0)
 
     def dataRfilter(self):
@@ -162,6 +161,7 @@ class MainGUI(QtWidgets.QMainWindow):
                 else:
                     self.filterlist = []
 
+    @QtCore.pyqtSlot(float)
     def ShowDataR(self, value):
         self.dataR = value
         self.ui.CurrentWe.display(float(self.dataR))
@@ -170,7 +170,6 @@ class MainGUI(QtWidgets.QMainWindow):
         # Update quantity displays
         self.ui.QuanBox.setText(str(int(self.count)))
         self.ui.QuanStampAuto.setText(str(int(self.count)))
-        self.ui.QuanStampManual.setText(str(int(self.countManual)))
 
     def Compare(self):
         # Compare weight and trigger printing if within range
@@ -184,7 +183,7 @@ class MainGUI(QtWidgets.QMainWindow):
                 self.ui.Status.setText(str(float((self.Delay2Print-self.t)/10)))
             if self.t >= self.Delay2Print:
                 self.t = 0
-                self.fileProcess.printdata()
+                self.fileProcess.printSheet()
                 self.printed = True
                 self.scale.full = True
                 self.count += 1
@@ -238,15 +237,16 @@ class MainGUI(QtWidgets.QMainWindow):
             return
 
     @QtCore.pyqtSlot()
-    def PrintStamp(self):
-        if len(self.ui.PdID.text()) <= 0:
-            self.in4(infor = 'Quét mã sản phẩm!')
+    def ShowStamp(self):
+        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
+            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
             self.ui.ProductID.setFocus()
             return
         if self.fileProcess.is_processing:
             self.in4(infor = 'Đang xử lý dữ liệu. Vui lòng đợi.', title = 'Thông tin')
             return
-        worker = Worker(self.fileProcess.generateImage)
+        # Use a worker to generate an image
+        worker = Worker(self.fileProcess.generateImage, self.data)
         worker.signals.result.connect(self.on_image_generated)
         worker.signals.error.connect(self.on_image_generation_error)
         self.threadpool.start(worker)
@@ -264,8 +264,8 @@ class MainGUI(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def ChangePd(self):
         # Change product
-        if len(self.ui.PdID.text()) <= 0:
-            self.in4(infor = 'Quét mã sản phẩm!')
+        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
+            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
             self.ui.ProductID.setFocus()
             return
         if not self.scale._run_flag:
@@ -286,7 +286,11 @@ class MainGUI(QtWidgets.QMainWindow):
         self.scale.scale.serial.close()
         self.scale.board.shutdown()
         self.scale.openPort()
-        self.scale.start()
+        if self.scale._run_flag:
+            self.in4(infor = 'Kết nối thành công!', title = 'Thông báo')
+            self.start_scale_worker()
+        else:
+            self.in4(infor = 'Không thể kết nối đến cân!')
 
     @QtCore.pyqtSlot()
     def ZeroRet(self):
@@ -299,9 +303,12 @@ class MainGUI(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def Calib(self):
         # Open calibration window
-        if len(self.ui.PdID.text()) <= 0:
-            self.in4(infor = 'Quét mã sản phẩm!')
+        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
+            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
             self.ui.ProductID.setFocus()
+            return
+        if self.fileProcess.changeEvent:
+            self.in4(infor = 'Nhấn nút "Kiểm tra tem" trước!', title = 'Lỗi')
             return
         self.qTimer2.stop()
         self.qTimer3.stop()
@@ -311,9 +318,9 @@ class MainGUI(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def Calendar(self):
         # Open calendar window
-        if len(self.ui.PdID.text()) <= 0:
+        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
+            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
             self.ui.Calendar.setChecked(0)
-            self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
             return
         self.calendar = Calendar(self)
@@ -349,13 +356,10 @@ class MainGUI(QtWidgets.QMainWindow):
             self.ui.ProductName.setText(add_newline_every_7_spaces(str(self.data['Name'].item())))
             self.ui.MinWe.setText(str(self.minwe))
             self.ui.MaxWe.setText(str(self.maxwe))
+            self.fileProcess.changeEvent = True
         except Exception as e:
             self.in4(infor = 'Lỗi dữ liệu, xem lại mã hàng này')
             return
-
-        # Use a worker to append data
-        worker = Worker(self.fileProcess.appendData, self.data)
-        self.threadpool.start(worker)
 
     def closeEvent(self, event = None):
         # Handle application close event
