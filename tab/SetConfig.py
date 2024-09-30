@@ -60,12 +60,12 @@ class SetConfig(QtWidgets.QWidget):
                 f"Arduino to Light: {self.ui.light.currentText()}"
             ]
             # Read the last three lines from ports.txt
-            with open('data/ports.txt', 'r') as file:
+            with open(self.MainWin.filePort, 'r') as file:
                 lines = file.readlines()
             last_three_lines = lines[-3:]  # Keep the last three lines
 
             # Write the new settings and the last three lines back to ports.txt
-            with open('data/ports.txt', 'w') as file:
+            with open(self.MainWin.filePort, 'w') as file:
                 file.write('\n'.join(new_ports) + '\n')
                 file.writelines(last_three_lines)
 

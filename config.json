@@ -96,6 +96,22 @@
   {
    "optionDest": "datas",
    "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/xlsx2csv.py;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/win32;win32/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/win32com;win32com/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/win32comext;win32comext/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/win32ctypes;win32ctypes/"
   }
  ],
  "nonPyinstallerOptions": {
