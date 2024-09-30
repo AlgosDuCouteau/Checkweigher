@@ -120,10 +120,10 @@ VÀ IN TEM TỰ ĐỘNG</string>
    </property>
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>150</y>
-     <width>741</width>
-     <height>41</height>
+     <x>180</x>
+     <y>130</y>
+     <width>761</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="font">

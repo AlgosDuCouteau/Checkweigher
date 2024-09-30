@@ -88,13 +88,14 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.Calendar.clicked.connect(self.Calendar)
         self.ui.ProductID.returnPressed.connect(self.ProductID)
         self.ui.ProductID.setFocus()
+        self.ui.QuanInput.returnPressed.connect(self.QuanInput)
         
         # Set up timers for various periodic tasks
         self.setupTimers()
         
         # Initialize variables
-        self.count, self.index, self.k, self.t1, self.t2, self.maxwe, self.minwe,  self.dataR = 0, 0, 0, 0, 0, 0, 0, 0
-        self.printed = False
+        self.quantityRun, self.quantityTotal, self.countManual, self.index, self.k, self.t1, self.t2, self.maxwe, self.minwe, self.dataR = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        self.printed, self.calibrated = False, False
         self.t = 0
         self.seq = ['rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(255, 255, 0)', 'rgb(0, 255, 0)']
         self.filterlist = []
@@ -137,7 +138,10 @@ class MainGUI(QtWidgets.QMainWindow):
 
     def resetdata(self):
         # Clear all input fields and reset display
+        self.quantityRun, self.quantityTotal = 0, 0
         self.ui.ProductID.clear()
+        self.ui.QuanInput.setStyleSheet("background-color: rgb(85, 255, 0);")
+        self.ui.QuanInput.setDisabled(False)
         self.ui.PdID.clear()
         self.ui.CATiD.clear()
         self.ui.INTiD.clear()
@@ -145,7 +149,9 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.MaxWe.clear()
         self.ui.MinWe.clear()
         self.ui.QuanBox.clear()
-        self.ui.QuanStampAuto.clear()
+        self.ui.QuanBoxTotal.clear()
+        self.ui.QuanBoxLeft.clear()
+        self.ui.QuanStampManual.clear()
         self.ui.Calendar.setChecked(0)
 
     def dataRfilter(self):
@@ -168,8 +174,17 @@ class MainGUI(QtWidgets.QMainWindow):
 
     def ShowPO(self):
         # Update quantity displays
-        self.ui.QuanBox.setText(str(int(self.count)))
-        self.ui.QuanStampAuto.setText(str(int(self.count)))
+        self.ui.QuanBox.setText(str(self.quantityRun))
+        self.ui.QuanBoxTotal.setText(str(self.quantityTotal))
+        self.ui.QuanBoxLeft.setText(str(self.quantityTotal - self.quantityRun))
+        if self.quantityRun == self.quantityTotal:
+            self.ui.QuanInput.setStyleSheet("background-color: rgb(85, 255, 0);")
+            self.ui.QuanInput.setDisabled(False)
+            self.ui.QuanInput.setFocus()
+            self.minwe, self.maxwe = 20.0, 24.0
+            self.ui.MinWe.setText(str(self.minwe))
+            self.ui.MaxWe.setText(str(self.maxwe))
+            self.calibrated = False
 
     def Compare(self):
         # Compare weight and trigger printing if within range
@@ -186,7 +201,7 @@ class MainGUI(QtWidgets.QMainWindow):
                 self.fileProcess.printSheet()
                 self.printed = True
                 self.scale.full = True
-                self.count += 1
+                self.quantityRun += 1
                 self.ShowPO()
         elif self.dataR < self.minwe/11.5:
             self.t = 0
@@ -238,9 +253,17 @@ class MainGUI(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def ShowStamp(self):
-        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
-            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
+        if len(self.ui.PdID.text()) <= 0:
+            self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
+            return
+        if self.ui.MachineID.currentIndex() == -1:
+            self.in4(infor = 'Chọn số máy!')
+            self.ui.MachineID.setFocus()
+            return
+        if not self.calibrated:
+            self.in4(infor = 'Nhập số lượng!')
+            self.ui.QuanInput.setFocus()
             return
         if self.fileProcess.is_processing:
             self.in4(infor = 'Đang xử lý dữ liệu. Vui lòng đợi.', title = 'Thông tin')
@@ -253,7 +276,9 @@ class MainGUI(QtWidgets.QMainWindow):
 
     def on_image_generated(self, imgFile):
         if imgFile:
-            self.showStamp = ShowStamp(self, imgFile)
+            # self.fileProcess.printSheet()
+            self.countManual += 1
+            self.ui.QuanStampManual.setText(str(self.countManual))
         else:
             self.in4(infor = 'Không thể tạo hình ảnh', title = 'Lỗi')
 
@@ -264,9 +289,17 @@ class MainGUI(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def ChangePd(self):
         # Change product
-        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
-            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
+        if len(self.ui.PdID.text()) <= 0:
+            self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
+            return
+        if self.ui.MachineID.currentIndex() == -1:
+            self.in4(infor = 'Chọn số máy!')
+            self.ui.MachineID.setFocus()
+            return
+        if not self.calibrated:
+            self.in4(infor = 'Nhập số lượng!')
+            self.ui.QuanInput.setFocus()
             return
         if not self.scale._run_flag:
             self.in4('Kiểm tra kết nối!')
@@ -276,6 +309,64 @@ class MainGUI(QtWidgets.QMainWindow):
         self.qTimer3.stop()
         self.qTimer4.stop()
         self.changepd = ChangePd(self)
+
+    @QtCore.pyqtSlot()
+    def ProductID(self):
+        # Process product ID input
+        def add_newline_every_7_spaces(s):
+            blank_count = 0
+            result = ""
+            for char in s:
+                if char == " ":
+                    blank_count += 1
+                    if blank_count % 6 == 0:
+                        result += "\n"
+                result += char
+            return result
+        pdid = self.ui.ProductID.text().strip().lower()
+        self.resetdata()
+        if not pdid:
+            return self.in4(infor = 'Quét mã sản phẩm!')
+        self.data = self.loadData.data.filter(pl.col('Code_Item') == pdid)
+        if self.data.is_empty():
+            return self.in4(infor = 'Không có mã sản phẩm này')
+        try:
+            self.minwe, self.maxwe = 20.0, 24.0
+            self.ui.QuanInput.setFocus()
+            self.ui.PdID.setText(pdid)
+            self.ui.ProductName.setText(add_newline_every_7_spaces(str(self.data['Name'].item())))
+            self.ui.MinWe.setText(str(self.minwe))
+            self.ui.MaxWe.setText(str(self.maxwe))
+            self.ui.INTiD.setText(str(self.data['INT'].item()))
+            self.ui.CATiD.setText(str(self.data['CAT'].item()))
+            self.fileProcess.changeEvent = True
+        except Exception as e:
+            self.in4(infor = 'Lỗi dữ liệu, xem lại mã hàng này')
+            return
+
+    @QtCore.pyqtSlot()
+    def QuanInput(self):
+        quan = self.ui.QuanInput.text()
+        self.ui.QuanInput.clear()
+        if not quan.isdigit():
+            return self.in4(infor = 'Số lượng phải là số!')
+        if int(quan) > 35:
+            return self.in4(infor = 'Số lượng không được lớn hơn 35!')
+        self.ui.QuanInput.setStyleSheet("background-color: rgb(255, 0, 0);")
+        self.ui.QuanInput.setDisabled(True)
+        self.quantityTotal = int(quan) + self.quantityTotal
+        self.calibrated = True
+        self.ShowPO()
+
+    @QtCore.pyqtSlot()
+    def Calendar(self):
+        # Open calendar window
+        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
+            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
+            self.ui.Calendar.setChecked(0)
+            self.ui.ProductID.setFocus()
+            return
+        self.calendar = Calendar(self)
 
     @QtCore.pyqtSlot()
     def ArduinoCon(self):
@@ -303,9 +394,17 @@ class MainGUI(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def Calib(self):
         # Open calibration window
-        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
-            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
+        if len(self.ui.PdID.text()) <= 0:
+            self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
+            return
+        if self.ui.MachineID.currentIndex() == -1:
+            self.in4(infor = 'Chọn số máy!')
+            self.ui.MachineID.setFocus()
+            return
+        if not self.calibrated:
+            self.in4(infor = 'Nhập số lượng!')
+            self.ui.QuanInput.setFocus()
             return
         if self.fileProcess.changeEvent:
             self.in4(infor = 'Nhấn nút "Kiểm tra tem" trước!', title = 'Lỗi')
@@ -314,52 +413,6 @@ class MainGUI(QtWidgets.QMainWindow):
         self.qTimer3.stop()
         self.qTimer4.stop()
         self.calib = CalibTab(self)
-
-    @QtCore.pyqtSlot()
-    def Calendar(self):
-        # Open calendar window
-        if len(self.ui.PdID.text()) <= 0 or self.ui.MachineID.currentIndex() == -1:
-            self.in4(infor = 'Quét mã sản phẩm và chọn số máy!')
-            self.ui.Calendar.setChecked(0)
-            self.ui.ProductID.setFocus()
-            return
-        self.calendar = Calendar(self)
-
-    @QtCore.pyqtSlot()
-    def ProductID(self):
-        # Process product ID input
-        def add_newline_every_7_spaces(s):
-            blank_count = 0
-            result = ""
-            for char in s:
-                if char == " ":
-                    blank_count += 1
-                    if blank_count % 6 == 0:
-                        result += "\n"
-                result += char
-            return result
-        pdid = self.ui.ProductID.text().strip().lower()
-        self.resetdata()
-        if not pdid:
-            return self.in4(infor = 'Quét mã sản phẩm!')
-        self.data = self.loadData.data.filter(pl.col('Code_Item') == pdid)
-        if self.data.is_empty():
-            return self.in4(infor = 'Không có mã sản phẩm này')
-        try:
-            self.ui.INTiD.setText(str(self.data['INT'].item()))
-            self.ui.CATiD.setText(str(self.data['CAT'].item()))
-            self.minwe, self.maxwe = 20.0, 24.0
-            self.count = 0
-            self.countManual = 0
-            self.ShowPO()
-            self.ui.PdID.setText(pdid)
-            self.ui.ProductName.setText(add_newline_every_7_spaces(str(self.data['Name'].item())))
-            self.ui.MinWe.setText(str(self.minwe))
-            self.ui.MaxWe.setText(str(self.maxwe))
-            self.fileProcess.changeEvent = True
-        except Exception as e:
-            self.in4(infor = 'Lỗi dữ liệu, xem lại mã hàng này')
-            return
 
     def closeEvent(self, event = None):
         # Handle application close event

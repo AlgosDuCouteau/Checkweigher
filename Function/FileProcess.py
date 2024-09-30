@@ -125,7 +125,7 @@ class FileProcess(QtCore.QObject):
     def generateImage(self, data):
         if self.is_processing:
             self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
-            return None
+            return False
 
         self.is_processing = True
         pythoncom.CoInitialize()
@@ -134,72 +134,73 @@ class FileProcess(QtCore.QObject):
                 self.appendData(data)
                 self.changeEvent = False
             if not self.printable:
-                return None
-            # Check if the image already exists
-            pdid = self.MainWin.ui.PdID.text()
-            output_folder = os.path.join(resource_path(), 'cell_range_images')
-            imgFile = os.path.join(output_folder, f'{pdid}_{self.info}.jpg')
+                return False
+            return True
+            # # Check if the image already exists
+            # pdid = self.MainWin.ui.PdID.text()
+            # output_folder = os.path.join(resource_path(), 'cell_range_images')
+            # imgFile = os.path.join(output_folder, f'{pdid}_{self.info}.jpg')
             
-            if os.path.exists(imgFile):
-                return imgFile
+            # if os.path.exists(imgFile):
+            #     return imgFile
             
-            # Get the range from data_print
-            cell_range = self.data_print.filter(pl.col('Types')==self.ws)['range'].item()
+            # # Get the range from data_print
+            # cell_range = self.data_print.filter(pl.col('Types')==self.ws)['range'].item()
 
-            # Split the cell range
-            start_cell, end_cell = cell_range.split(':')
+            # # Split the cell range
+            # start_cell, end_cell = cell_range.split(':')
             
-            # Convert column letters to numbers
-            def col_to_num(col):
-                num = 0
-                for c in col:
-                    if c.isalpha():
-                        num = num * 26 + (ord(c.upper()) - ord('A')) + 1
-                return num
+            # # Convert column letters to numbers
+            # def col_to_num(col):
+            #     num = 0
+            #     for c in col:
+            #         if c.isalpha():
+            #             num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+            #     return num
 
-            # Extract start and end columns and rows
-            start_col = col_to_num(''.join(filter(str.isalpha, start_cell)))
-            start_row = int(''.join(filter(str.isdigit, start_cell)))
-            end_col = col_to_num(''.join(filter(str.isalpha, end_cell)))
-            end_row = int(''.join(filter(str.isdigit, end_cell)))
+            # # Extract start and end columns and rows
+            # start_col = col_to_num(''.join(filter(str.isalpha, start_cell)))
+            # start_row = int(''.join(filter(str.isdigit, start_cell)))
+            # end_col = col_to_num(''.join(filter(str.isalpha, end_cell)))
+            # end_row = int(''.join(filter(str.isdigit, end_cell)))
 
-            o = win32com.client.Dispatch('Excel.Application')
-            o.DisplayAlerts = False
+            # o = win32com.client.Dispatch('Excel.Application')
+            # o.DisplayAlerts = False
 
-            try:
-                # Open the workbook
-                wb = o.Workbooks.Open(self.filePrint)
-                ws = wb.Worksheets(self.ws)
+            # try:
+            #     # Open the workbook
+            #     wb = o.Workbooks.Open(self.filePrint)
+            #     ws = wb.Worksheets(self.ws)
 
-                ws.Range(ws.Cells(start_row, start_col), ws.Cells(end_row, end_col)).Copy()
-                img = ImageGrab.grabclipboard()
+            #     ws.Range(ws.Cells(start_row, start_col), ws.Cells(end_row, end_col)).Copy()
+            #     img = ImageGrab.grabclipboard()
 
-                # Resize the image to 600x360
-                img = img.resize((920, 520), Image.LANCZOS)
+            #     # Resize the image to 600x360
+            #     img = img.resize((920, 520), Image.LANCZOS)
 
-                # Create the output folder if it doesn't exist
-                os.makedirs(output_folder, exist_ok=True)
+            #     # Create the output folder if it doesn't exist
+            #     os.makedirs(output_folder, exist_ok=True)
 
-                img.save(imgFile, quality=95)  # Save with high quality
+            #     img.save(imgFile, quality=95)  # Save with high quality
 
-                return imgFile
+            #     return imgFile
 
-            finally:
-                # Clear clipboard before closing Excel
-                win32clipboard.OpenClipboard()
-                win32clipboard.EmptyClipboard()
-                win32clipboard.CloseClipboard()
+            # finally:
+            #     # Clear clipboard before closing Excel
+            #     win32clipboard.OpenClipboard()
+            #     win32clipboard.EmptyClipboard()
+            #     win32clipboard.CloseClipboard()
 
-                # Close Excel
-                if 'wb' in locals():
-                    wb.Close(SaveChanges=False)
-                o.Quit()
+            #     # Close Excel
+            #     if 'wb' in locals():
+            #         wb.Close(SaveChanges=False)
+            #     o.Quit()
 
-                os.system('taskkill /f /IM EXCEL.exe')
+            #     os.system('taskkill /f /IM EXCEL.exe')
 
         except Exception as e:
             self.error.emit((type(e), str(e), traceback.format_exc()))
-            return None
+            return False
         finally:
             pythoncom.CoUninitialize()
             self.is_processing = False
