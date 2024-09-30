@@ -276,7 +276,7 @@ class MainGUI(QtWidgets.QMainWindow):
 
     def on_image_generated(self, imgFile):
         if imgFile:
-            # self.fileProcess.printSheet()
+            self.fileProcess.printSheet()
             self.countManual += 1
             self.ui.QuanStampManual.setText(str(self.countManual))
         else:
