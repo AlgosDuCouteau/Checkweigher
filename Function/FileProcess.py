@@ -30,13 +30,12 @@ class FileProcess(QtCore.QObject):
         super().__init__()
         self.MainWin = MainWin
         self.filePrint = filePrint
-        self.data_print = self.MainWin.loadData.data_print
         self.moa = ['A', 'B', 'C', 'D',
                     'E', 'F', 'G', 'H',
                     'J', 'K', 'L', 'M', 
                     'N', 'P', 'Q', 'R',
                     'S', 'T', 'U']
-        self.is_processing, self.printable, self.changeEvent = False, False, False
+        self.is_processing = False
     
     def removeSpc(self, text):
         text = str(text)
@@ -45,11 +44,16 @@ class FileProcess(QtCore.QObject):
             text = text.replace(char, '')
         return str(text)
 
-    def appendData(self, data: pl.DataFrame):
+    @QtCore.pyqtSlot()
+    def printSheet(self, data: pl.DataFrame, data_print: pl.DataFrame):
+        if self.is_processing:
+            self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
+            return False
+        self.is_processing = True
+        pythoncom.CoInitialize()
         try:
             if data['Dinh_dang_Tem_Thung'].item() == 'OEM':
-                self.printable = False
-                return
+                return False
             self.ws = data['Dinh_dang_Tem_Thung'].item()
             curr_time = datetime.now()
             if curr_time.hour >= 6 and curr_time.hour < 14:
@@ -78,8 +82,7 @@ class FileProcess(QtCore.QObject):
             self.info = info
             year_month = ymdn[:-3].rstrip()
             lot = ymdn[2]+ymdn[3]+ymdn[5]+ymdn[6]+data['Ma_1'].item()
-            layouts = self.data_print.filter(pl.col('Types')==self.ws)
-            layout = layouts[[s.name for s in layouts if not (s.null_count() > 0)]]
+            layout = data_print[[s.name for s in data_print if not (s.null_count() > 0)]]
             os.system('taskkill /f /IM EXCEL.exe')
             with xw.App(visible=False) as app:
                 wb = xw.Book(self.filePrint)
@@ -114,107 +117,115 @@ class FileProcess(QtCore.QObject):
                         ws[layout['quan_cat_barcode'].item()].value = barcode
                         barcode = ''
                         ws[layout['int1'].item()].value = data['INT'].item()
+                ws.api.PrintOut()
                 wb.save()
                 wb.close()
         except Exception as e:
-            logging.error(f"{get_file_and_line()}: {traceback.format_exc()}")
-        finally:
-            self.printable = True
-            
-    @QtCore.pyqtSlot()
-    def generateImage(self, data):
-        if self.is_processing:
-            self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
-            return False
-
-        self.is_processing = True
-        pythoncom.CoInitialize()
-        try:
-            if self.changeEvent:
-                self.appendData(data)
-                self.changeEvent = False
-            if not self.printable:
-                return False
-            return True
-            # # Check if the image already exists
-            # pdid = self.MainWin.ui.PdID.text()
-            # output_folder = os.path.join(resource_path(), 'cell_range_images')
-            # imgFile = os.path.join(output_folder, f'{pdid}_{self.info}.jpg')
-            
-            # if os.path.exists(imgFile):
-            #     return imgFile
-            
-            # # Get the range from data_print
-            # cell_range = self.data_print.filter(pl.col('Types')==self.ws)['range'].item()
-
-            # # Split the cell range
-            # start_cell, end_cell = cell_range.split(':')
-            
-            # # Convert column letters to numbers
-            # def col_to_num(col):
-            #     num = 0
-            #     for c in col:
-            #         if c.isalpha():
-            #             num = num * 26 + (ord(c.upper()) - ord('A')) + 1
-            #     return num
-
-            # # Extract start and end columns and rows
-            # start_col = col_to_num(''.join(filter(str.isalpha, start_cell)))
-            # start_row = int(''.join(filter(str.isdigit, start_cell)))
-            # end_col = col_to_num(''.join(filter(str.isalpha, end_cell)))
-            # end_row = int(''.join(filter(str.isdigit, end_cell)))
-
-            # o = win32com.client.Dispatch('Excel.Application')
-            # o.DisplayAlerts = False
-
-            # try:
-            #     # Open the workbook
-            #     wb = o.Workbooks.Open(self.filePrint)
-            #     ws = wb.Worksheets(self.ws)
-
-            #     ws.Range(ws.Cells(start_row, start_col), ws.Cells(end_row, end_col)).Copy()
-            #     img = ImageGrab.grabclipboard()
-
-            #     # Resize the image to 600x360
-            #     img = img.resize((920, 520), Image.LANCZOS)
-
-            #     # Create the output folder if it doesn't exist
-            #     os.makedirs(output_folder, exist_ok=True)
-
-            #     img.save(imgFile, quality=95)  # Save with high quality
-
-            #     return imgFile
-
-            # finally:
-            #     # Clear clipboard before closing Excel
-            #     win32clipboard.OpenClipboard()
-            #     win32clipboard.EmptyClipboard()
-            #     win32clipboard.CloseClipboard()
-
-            #     # Close Excel
-            #     if 'wb' in locals():
-            #         wb.Close(SaveChanges=False)
-            #     o.Quit()
-
-            #     os.system('taskkill /f /IM EXCEL.exe')
-
-        except Exception as e:
+            self.is_processing = False
             self.error.emit((type(e), str(e), traceback.format_exc()))
-            return False
+            logging.error(f"{get_file_and_line()}: {traceback.format_exc()}")
+            return
         finally:
             pythoncom.CoUninitialize()
             self.is_processing = False
             self.finished.emit()
+            
+    # @QtCore.pyqtSlot()
+    # def generateImage(self, data, data_print):
+    #     if self.is_processing:
+    #         self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
+    #         return False
 
-    def printSheet(self):
-        try:
-            if not self.printable or self.is_processing or self.changeEvent:
-                return
-            with xw.App(visible=False) as app:
-                wb = xw.Book(self.filePrint)
-                ws = wb.sheets[self.ws]
-                ws.api.PrintOut()
-        except Exception as e:
-            logging.error(f"{get_file_and_line()}: {traceback.format_exc()}")
-            return
+    #     self.is_processing = True
+    #     pythoncom.CoInitialize()
+    #     try:
+    #         res = self.appendData(data, data_print)
+    #         return res
+    #         # Check if the image already exists
+    #         pdid = self.MainWin.ui.PdID.text()
+    #         output_folder = os.path.join(resource_path(), 'cell_range_images')
+    #         imgFile = os.path.join(output_folder, f'{pdid}_{self.info}.jpg')
+            
+    #         if os.path.exists(imgFile):
+    #             return imgFile
+            
+    #         # Get the range from data_print
+    #         cell_range = self.data_print.filter(pl.col('Types')==self.ws)['range'].item()
+
+    #         # Split the cell range
+    #         start_cell, end_cell = cell_range.split(':')
+            
+    #         # Convert column letters to numbers
+    #         def col_to_num(col):
+    #             num = 0
+    #             for c in col:
+    #                 if c.isalpha():
+    #                     num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+    #             return num
+
+    #         # Extract start and end columns and rows
+    #         start_col = col_to_num(''.join(filter(str.isalpha, start_cell)))
+    #         start_row = int(''.join(filter(str.isdigit, start_cell)))
+    #         end_col = col_to_num(''.join(filter(str.isalpha, end_cell)))
+    #         end_row = int(''.join(filter(str.isdigit, end_cell)))
+
+    #         o = win32com.client.Dispatch('Excel.Application')
+    #         o.DisplayAlerts = False
+
+    #         try:
+    #             # Open the workbook
+    #             wb = o.Workbooks.Open(self.filePrint)
+    #             ws = wb.Worksheets(self.ws)
+
+    #             ws.Range(ws.Cells(start_row, start_col), ws.Cells(end_row, end_col)).Copy()
+    #             img = ImageGrab.grabclipboard()
+
+    #             # Resize the image to 600x360
+    #             img = img.resize((920, 520), Image.LANCZOS)
+
+    #             # Create the output folder if it doesn't exist
+    #             os.makedirs(output_folder, exist_ok=True)
+
+    #             img.save(imgFile, quality=95)  # Save with high quality
+
+    #             return imgFile
+
+    #         finally:
+    #             # Clear clipboard before closing Excel
+    #             win32clipboard.OpenClipboard()
+    #             win32clipboard.EmptyClipboard()
+    #             win32clipboard.CloseClipboard()
+
+    #             # Close Excel
+    #             if 'wb' in locals():
+    #                 wb.Close(SaveChanges=False)
+    #             o.Quit()
+
+    #             os.system('taskkill /f /IM EXCEL.exe')
+
+    #     except Exception as e:
+    #         self.error.emit((type(e), str(e), traceback.format_exc()))
+    #         return
+    #     finally:
+    #         pythoncom.CoUninitialize()
+    #         self.is_processing = False
+    #         self.finished.emit()
+
+    # @QtCore.pyqtSlot()
+    # def printSheet(self, data, data_print):
+    #     if self.is_processing:
+    #         self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
+    #         return False
+    #     self.is_processing = True
+    #     pythoncom.CoInitialize()
+    #     try:
+    #         self.appendData(data, data_print)
+    #     except Exception as e:
+    #         self.error.emit((type(e), str(e), traceback.format_exc()))
+    #         logging.error(f"{get_file_and_line()}: {traceback.format_exc()}")
+    #         return
+    #     finally:
+    #         pythoncom.CoUninitialize()
+    #         self.is_processing = False
+    #         self.finished.emit()
 

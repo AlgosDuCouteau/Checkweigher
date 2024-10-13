@@ -63,9 +63,9 @@ class MainGUI(QtWidgets.QMainWindow):
         self.Quan2Print = data['Quan2Print']
         
         # Initialize components
-        self.loadData = LoadData(self, fileData=fileData, filePrint=self.filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
         self.fileProcess = FileProcess(self, filePrint=self.filePrint)
         self.scale = GetScale(portScale=self.portScale, portArduino=self.portArduino, Ard2Convey=self.Ard2Convey, Ard2Light=self.Ard2Light)
+        self.loadData = LoadData(self, fileData=fileData, filePrint=self.filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
         t = time.time()
         self.scale.openPort()
         print(time.time() - t)
@@ -95,7 +95,7 @@ class MainGUI(QtWidgets.QMainWindow):
         
         # Initialize variables
         self.quantityRun, self.quantityTotal, self.countManual, self.index, self.k, self.t1, self.t2, self.maxwe, self.minwe, self.dataR = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        self.printed, self.calibrated = False, False
+        self.printed, self.quanInputted, self.checked = False, False, False
         self.t = 0
         self.seq = ['rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(255, 255, 0)', 'rgb(0, 255, 0)']
         self.filterlist = []
@@ -138,6 +138,8 @@ class MainGUI(QtWidgets.QMainWindow):
 
     def resetdata(self):
         # Clear all input fields and reset display
+        self.quanInputted = False
+        self.checked = False
         self.quantityRun, self.quantityTotal = 0, 0
         self.ui.ProductID.clear()
         self.ui.QuanInput.setStyleSheet("background-color: rgb(85, 255, 0);")
@@ -178,14 +180,14 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.QuanBoxTotal.setText(str(self.quantityTotal))
         self.ui.QuanBoxLeft.setText(str(self.quantityTotal - self.quantityRun))
         if self.quantityRun == self.quantityTotal:
+            self.quanInputted = False
             self.ui.QuanInput.setStyleSheet("background-color: rgb(85, 255, 0);")
             self.ui.QuanInput.setDisabled(False)
             self.ui.QuanInput.setFocus()
             self.minwe, self.maxwe = 20.0, 24.0
             self.ui.MinWe.setText(str(self.minwe))
             self.ui.MaxWe.setText(str(self.maxwe))
-            self.calibrated = False
-
+            
     def Compare(self):
         # Compare weight and trigger printing if within range
         if len(self.ui.PdID.text()) <= 0 or self.maxwe == 0 or self.minwe == 0:
@@ -198,7 +200,7 @@ class MainGUI(QtWidgets.QMainWindow):
                 self.ui.Status.setText(str(float((self.Delay2Print-self.t)/10)))
             if self.t >= self.Delay2Print:
                 self.t = 0
-                self.fileProcess.printSheet()
+                self.fileProcess.printSheet(self.data, self.data_print)
                 self.printed = True
                 self.scale.full = True
                 self.quantityRun += 1
@@ -257,33 +259,30 @@ class MainGUI(QtWidgets.QMainWindow):
             self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
             return
+        if not self.quanInputted:
+            self.in4(infor = 'Nhập số lượng!')
+            self.ui.QuanInput.setFocus()
+            return
         if self.ui.MachineID.currentIndex() == -1:
             self.in4(infor = 'Chọn số máy!')
             self.ui.MachineID.setFocus()
-            return
-        if not self.calibrated:
-            self.in4(infor = 'Nhập số lượng!')
-            self.ui.QuanInput.setFocus()
             return
         if self.fileProcess.is_processing:
             self.in4(infor = 'Đang xử lý dữ liệu. Vui lòng đợi.', title = 'Thông tin')
             return
         # Use a worker to generate an image
-        worker = Worker(self.fileProcess.generateImage, self.data)
-        worker.signals.result.connect(self.on_image_generated)
-        worker.signals.error.connect(self.on_image_generation_error)
+        worker = Worker(self.fileProcess.printSheet, self.data, self.data_print)
+        worker.signals.finished.connect(self.print_success)
+        worker.signals.error.connect(self.print_error)
         self.threadpool.start(worker)
 
-    def on_image_generated(self, imgFile):
-        if imgFile:
-            self.fileProcess.printSheet()
-            self.countManual += 1
-            self.ui.QuanStampManual.setText(str(self.countManual))
-        else:
-            self.in4(infor = 'Không thể tạo hình ảnh', title = 'Lỗi')
+    def print_success(self):
+        self.checked = True
+        self.countManual += 1
+        self.ui.QuanStampManual.setText(str(self.countManual))
 
-    def on_image_generation_error(self, error):
-        error_type, error_instance, traceback = error
+    def print_error(self, error):
+        _, error_instance, _ = error
         self.in4(infor = f'Lỗi khi tạo hình ảnh: {error_instance}')
 
     @QtCore.pyqtSlot()
@@ -293,13 +292,13 @@ class MainGUI(QtWidgets.QMainWindow):
             self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
             return
+        if not self.quanInputted:
+            self.in4(infor = 'Nhập số lượng!')
+            self.ui.QuanInput.setFocus()
+            return
         if self.ui.MachineID.currentIndex() == -1:
             self.in4(infor = 'Chọn số máy!')
             self.ui.MachineID.setFocus()
-            return
-        if not self.calibrated:
-            self.in4(infor = 'Nhập số lượng!')
-            self.ui.QuanInput.setFocus()
             return
         if not self.scale._run_flag:
             self.in4('Kiểm tra kết nối!')
@@ -331,6 +330,7 @@ class MainGUI(QtWidgets.QMainWindow):
         if self.data.is_empty():
             return self.in4(infor = 'Không có mã sản phẩm này')
         try:
+            self.data_print = self.loadData.data_print.filter(pl.col('Types')==self.data['Dinh_dang_Tem_Thung'].item())
             self.minwe, self.maxwe = 20.0, 24.0
             self.ui.QuanInput.setFocus()
             self.ui.PdID.setText(pdid)
@@ -339,7 +339,6 @@ class MainGUI(QtWidgets.QMainWindow):
             self.ui.MaxWe.setText(str(self.maxwe))
             self.ui.INTiD.setText(str(self.data['INT'].item()))
             self.ui.CATiD.setText(str(self.data['CAT'].item()))
-            self.fileProcess.changeEvent = True
         except Exception as e:
             self.in4(infor = 'Lỗi dữ liệu, xem lại mã hàng này')
             return
@@ -355,7 +354,7 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.QuanInput.setStyleSheet("background-color: rgb(255, 0, 0);")
         self.ui.QuanInput.setDisabled(True)
         self.quantityTotal = int(quan) + self.quantityTotal
-        self.calibrated = True
+        self.quanInputted = True
         self.ShowPO()
 
     @QtCore.pyqtSlot()
@@ -398,16 +397,16 @@ class MainGUI(QtWidgets.QMainWindow):
             self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
             return
+        if not self.quanInputted:
+            self.in4(infor = 'Nhập số lượng!')
+            self.ui.QuanInput.setFocus()
+            return
         if self.ui.MachineID.currentIndex() == -1:
             self.in4(infor = 'Chọn số máy!')
             self.ui.MachineID.setFocus()
             return
-        if not self.calibrated:
-            self.in4(infor = 'Nhập số lượng!')
-            self.ui.QuanInput.setFocus()
-            return
-        if self.fileProcess.changeEvent:
-            self.in4(infor = 'Nhấn nút "Kiểm tra tem" trước!', title = 'Lỗi')
+        if not self.checked:
+            self.in4(infor = 'Chưa kiểm tra tem!')
             return
         self.qTimer2.stop()
         self.qTimer3.stop()
