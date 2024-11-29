@@ -1,7 +1,0 @@
-Weight scale to PC: COM2
-Arduino to PC: COM3
-Arduino to Conveyor: 3
-Arduino to Light: 2
-Database: G
-Delay2Print(ms): 100
-Quan2Print: 12
