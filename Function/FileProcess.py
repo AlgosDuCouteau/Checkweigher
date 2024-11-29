@@ -82,41 +82,50 @@ class FileProcess(QtCore.QObject):
             self.info = info
             year_month = ymdn[:-3].rstrip()
             lot = ymdn[2]+ymdn[3]+ymdn[5]+ymdn[6]+data['Ma_1'].item()
-            layout = data_print[[s.name for s in data_print if not (s.null_count() > 0)]]
             os.system('taskkill /f /IM EXCEL.exe')
             with xw.App(visible=False) as app:
                 wb = xw.Book(self.filePrint)
                 ws = wb.sheets[self.ws]
-                ws[layout['info'].item()].value = info
-                ws[layout['int'].item()].value = data['INT'].item()
-                ws[layout['lot'].item()].value = lot
-                ws[layout['name'].item()].value = data['Name'].item()
-                ws[layout['year_month'].item()].value = year_month
-                ws[layout['quantity'].item()].value = str(int(data['Quantity_thung'].item()))+' '+data['Don_vi_thung'].item()
-                ws[layout['cat'].item()].value = data['CAT'].item()
-                ws[layout['size'].item()].value = data['Size'].item()
-                ws[layout['product_of'].item()].value = data['ProductOf'].item()
-                barcode = IDAutomation_Uni_C128(self.removeSpc(data['Ma_vach_thung_dau'].item()+lot+data['Ma_vach_thung_duoi'].item()))
-                ws[layout['barcode'].item()].value = barcode
-                barcode = ''
-                ws[layout['code'].item()].value = data['Ma_vach_thung_dau'].item()+lot+data['Ma_vach_thung_duoi'].item()
-                if layout.width > 12:
-                    if layout['Types'].item() == 'TemThung2MaVachKoSo':
-                        ws[layout['cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['CAT'].item()
-                        barcode = IDAutomation_Uni_C39(self.removeSpc(data['CAT'].item()))
-                        ws[layout['cat_barcode'].item()].value = barcode
-                        barcode = ''
-                    elif layout['Types'].item() == 'TemThung2MaVachCoSo':
-                        ws[layout['quan_cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['CAT'].item()
+                if data_print['info'].item():
+                    ws[data_print['info'].item()].value = info
+                if data_print['int'].item():
+                    ws[data_print['int'].item()].value = data['INT'].item()
+                if data_print['lot'].item():
+                    ws[data_print['lot'].item()].value = lot
+                if data_print['name'].item():
+                    ws[data_print['name'].item()].value = data['Name'].item()
+                if data_print['year_month'].item():
+                    ws[data_print['year_month'].item()].value = year_month
+                if data_print['quantity'].item():
+                    ws[data_print['quantity'].item()].value = str(int(data['Quantity_thung'].item()))+' '+data['Don_vi_thung'].item()
+                if data_print['cat'].item():
+                    ws[data_print['cat'].item()].value = data['CAT'].item()
+                if data_print['size'].item():
+                    ws[data_print['size'].item()].value = data['Size'].item()
+                if data_print['product_of'].item():
+                    ws[data_print['product_of'].item()].value = data['ProductOf'].item()
+                if data_print['barcode'].item():
+                    barcode = IDAutomation_Uni_C128(self.removeSpc(data['Ma_vach_thung_dau'].item()+lot+data['Ma_vach_thung_duoi'].item()))
+                    ws[data_print['barcode'].item()].value = barcode
+                    barcode = ''
+                    ws[data_print['code'].item()].value = data['Ma_vach_thung_dau'].item()+lot+data['Ma_vach_thung_duoi'].item()
+                if data_print['cat_code'].item():
+                    ws[data_print['cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['CAT'].item()
+                    barcode = IDAutomation_Uni_C39(self.removeSpc(data['CAT'].item()))
+                    ws[data_print['cat_barcode'].item()].value = barcode
+                    barcode = ''
+                if data_print['quan_cat_code'].item():
+                    if data_print['Types'].item() == 'TemThung2MaVachCoSo':
+                        ws[data_print['quan_cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['CAT'].item()
                         barcode = IDAutomation_Uni_C39(self.removeSpc(str(int(data['Quantity_thung'].item()))+' '+data['CAT'].item()))
-                        ws[layout['quan_cat_barcode'].item()].value = barcode
+                        ws[data_print['quan_cat_barcode'].item()].value = barcode
                         barcode = ''
-                    elif layout['Types'].item() == 'TemThung2MaVachMoi':
-                        ws[layout['quan_cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['Ma_vach_nho'].item()
+                    elif data_print['Types'].item() == 'TemThung2MaVachMoi' or data_print['Types'].item() == 'TemThung2MaVachMoi2':
+                        ws[data_print['quan_cat_code'].item()].value = '('+str(int(data['Quantity_thung'].item()))+') '+data['Ma_vach_nho'].item()
                         barcode = IDAutomation_Uni_C39(self.removeSpc(str(int(data['Quantity_thung'].item()))+' '+data['Ma_vach_nho'].item()))
-                        ws[layout['quan_cat_barcode'].item()].value = barcode
+                        ws[data_print['quan_cat_barcode'].item()].value = barcode
                         barcode = ''
-                        ws[layout['int1'].item()].value = data['INT'].item()
+                        ws[data_print['int1'].item()].value = data['INT'].item()
                 ws.api.PrintOut()
                 wb.save()
                 wb.close()
