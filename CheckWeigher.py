@@ -155,6 +155,8 @@ class MainGUI(QtWidgets.QMainWindow):
         self.ui.QuanBoxLeft.clear()
         self.ui.QuanStampManual.clear()
         self.ui.Calendar.setChecked(0)
+        self.ui.DD_MM_YY.setText('')
+        self.countManual = 0
 
     def dataRfilter(self):
         # Filter weight data to detect sudden changes
