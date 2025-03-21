@@ -17,6 +17,10 @@ class SetConfig(QtWidgets.QWidget):
         self.ui.arduino_Confirm.clicked.connect(lambda: self.changeHandle(self.ui.arduino.currentText(), sender=self.ui.arduino_Confirm))
         self.ui.conveyor_Confirm.clicked.connect(lambda: self.changeHandle(self.ui.conveyor.currentText(), sender=self.ui.conveyor_Confirm))
         self.ui.light_Confirm.clicked.connect(lambda: self.changeHandle(self.ui.light.currentText(), sender=self.ui.light_Confirm))
+        self.ui.range_Confirm.clicked.connect(self.setRange)
+
+    def setRange(self):
+        self.MainWin.range = int(self.ui.range.currentText())
 
     def setDefault(self):
         self.ui.scale_def.setText(str(self.MainWin.portScale))
@@ -27,6 +31,7 @@ class SetConfig(QtWidgets.QWidget):
         self.ui.arduino.setCurrentText(str(self.MainWin.portArduino))
         self.ui.conveyor.setCurrentText(str(self.MainWin.Ard2Convey))
         self.ui.light.setCurrentText(str(self.MainWin.Ard2Light))
+        self.ui.range.setCurrentIndex(0)
 
     def changeHandle(self, text, sender):
         # Set change to True if any value is different from the default

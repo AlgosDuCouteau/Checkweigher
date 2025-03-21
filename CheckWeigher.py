@@ -61,6 +61,7 @@ class MainGUI(QtWidgets.QMainWindow):
         self.Ard2Light = data['Ard2Light']
         self.Delay2Print = data['Delay2Print']
         self.Quan2Print = data['Quan2Print']
+        self.range = 2
         
         # Initialize components
         self.fileProcess = FileProcess(self, filePrint=self.filePrint)
@@ -247,13 +248,14 @@ class MainGUI(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def UpdateData(self):
-        # Update data from source
-        try:
-            self.loadData.updatedata()
-            self.in4(infor = 'Hoàn thành cập nhật', title = 'Thông tin')
-        except Exception as e:
-            self.in4(infor = 'Lỗi dữ liệu, không thể cập nhật!')
-            return
+        print(self.range, type(self.range))
+        # # Update data from source
+        # try:
+        #     self.loadData.updatedata()
+        #     self.in4(infor = 'Hoàn thành cập nhật', title = 'Thông tin')
+        # except Exception as e:
+        #     self.in4(infor = 'Lỗi dữ liệu, không thể cập nhật!')
+        #     return
 
     @QtCore.pyqtSlot()
     def ShowStamp(self):

@@ -1,10 +1,17 @@
-/UI/__pycache__
-/tab/__pycache__
-/SubFunction/__pycache__
-/SubFunction/vb2py/__pycache__
-/Function/__pycache__
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
 .venv
-output
-errors.txt
+.env
+
+# Dir
 cell_range_images
 data
+output
+errors.txt
