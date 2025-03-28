@@ -36,6 +36,7 @@ dependencies = [
     "pefile==2024.8.26",
     "pillow==10.4.0",
     "polars-lts-cpu==1.6.0",
+    "psutil>=7.0.0",
     "pyarrow==13.0.0",
     "pycparser==2.22",
     "pyinstaller==6.10.0",

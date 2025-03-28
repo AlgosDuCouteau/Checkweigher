@@ -13,6 +13,12 @@ class CalibTab(QtWidgets.QWidget):
         self.CalibTab.show()
         self.MainWin = MainWin
         self.MainWin.hide()
+        if self.MainWin.data['Dinh_dang_Tem_Thung'].item() == 'OEM':
+            self.quantity_batch = int(self.MainWin.data['So_luong_cay_bo_trong_thung'].item())
+        else:
+            self.quantity_batch = int(int(self.MainWin.data['Quantity_thung'].item())/int(self.MainWin.data['So_luong_liner_trong_bo'].item()))
+        self.ui.label.setText(f"Khối lượng\n1 thùng {self.quantity_batch} gói (kg)")
+        self.ui.label_2.setText(f"Khối lượng\n1 gói {int(self.MainWin.data['So_luong_liner_trong_bo'].item())} đôi (kg)")
         self.ui.Arrow2.hide()
         self.ui.Arrow3.hide()
         self.ui.ConfirmAll.setText('Quay lại')
@@ -52,12 +58,12 @@ class CalibTab(QtWidgets.QWidget):
         self.ui.Confirm2.setDisabled(1)
         self.ui.Confirm.setEnabled(1)
         self.bunchwe = float(self.ui.BunchWe.value())
-        if abs(self.packwe - self.bunchwe*12) >= 0.35 and abs(self.packwe - self.bunchwe*12) <= 1.55:
-            if self.packwe <= self.bunchwe*12.25 + self.packwe - self.bunchwe*12 and \
-            self.packwe >= self.bunchwe*11.75 + self.packwe - self.bunchwe*12 and \
+        if abs(self.packwe - self.bunchwe*self.quantity_batch) >= 0.35 and abs(self.packwe - self.bunchwe*self.quantity_batch) <= 1.55:
+            if self.packwe <= self.bunchwe*(self.quantity_batch+0.25) + self.packwe - self.bunchwe*self.quantity_batch and \
+            self.packwe >= self.bunchwe*(self.quantity_batch-0.25) + self.packwe - self.bunchwe*self.quantity_batch and \
             self.packwe > 0:
-                self.maxw = round(self.packwe + abs(self.bunchwe/2), 2)
-                self.minw = round(self.packwe - abs(self.bunchwe/2), 2)
+                self.maxw = round(self.packwe + abs(self.bunchwe*self.MainWin.range), 2)
+                self.minw = round(self.packwe - abs(self.bunchwe*self.MainWin.range), 2)
                 self.ui.ConfirmAll.setText('Cập nhật')
                 self.ui.Arrow3.show()
                 self.step = 2

@@ -20,7 +20,10 @@ class SetConfig(QtWidgets.QWidget):
         self.ui.range_Confirm.clicked.connect(self.setRange)
 
     def setRange(self):
-        self.MainWin.range = int(self.ui.range.currentText())
+        if self.ui.range.currentText() == '1/2':
+            self.MainWin.range = 0.5
+        elif self.ui.range.currentText() == '1/4':
+            self.MainWin.range = 0.25
 
     def setDefault(self):
         self.ui.scale_def.setText(str(self.MainWin.portScale))
@@ -31,7 +34,7 @@ class SetConfig(QtWidgets.QWidget):
         self.ui.arduino.setCurrentText(str(self.MainWin.portArduino))
         self.ui.conveyor.setCurrentText(str(self.MainWin.Ard2Convey))
         self.ui.light.setCurrentText(str(self.MainWin.Ard2Light))
-        self.ui.range.setCurrentIndex(0)
+        self.ui.range.setCurrentIndex(1) if self.MainWin.range == 0.5 else self.ui.range.setCurrentIndex(0)
 
     def changeHandle(self, text, sender):
         # Set change to True if any value is different from the default

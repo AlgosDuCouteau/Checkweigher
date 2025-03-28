@@ -41,7 +41,8 @@ class LoadData():
                                  engine='xlsx2csv', engine_options={"skip_empty_lines": True, 'skip_hidden_rows': False},
                                  columns=['Code_Item', 'Name', 'ProductOf', 'Quantity_thung',
                                           'CAT', 'INT', 'Size', 'Dinh_dang_Tem_Thung',
-                                          'Ma_1', 'Ma_vach_thung_dau', 'Ma_vach_thung_duoi', 'Ma_vach_nho', 'Don_vi_thung'])
+                                          'Ma_1', 'Ma_vach_thung_dau', 'Ma_vach_thung_duoi', 'Ma_vach_nho', 'Don_vi_thung',
+                                          'So_luong_cay_bo_trong_thung', 'So_luong_liner_trong_bo'])
             data_print = pl.read_excel(source = self.fileData, sheet_name = 'Layouts',
                                        engine='xlsx2csv', engine_options={"skip_empty_lines": True, 'skip_hidden_rows': False})
             return data, data_print
@@ -59,7 +60,7 @@ class LoadData():
                                  'Quantity thùng', 'Name', 'CAT', 'INT',
                                  'Size', 'Định dạng Tem Thùng', 'Quantity', 'Mã 1', 
                                  'Mã vạch thùng đầu', 'Mã vạch thùng đuôi', 'Mã vạch túi đầu', 'Mã vạch túi cuối',
-                                 'Định dạng Tem Túi', 'Mã vạch nhỏ', 'Đơn vị thùng', 'Đơn vị túi'])
+                                 'Định dạng Tem Túi', 'Mã vạch nhỏ', 'Đơn vị thùng', 'Đơn vị túi', 'Số lượng cây/bó trong thùng', 'Số lượng liner trong bó'])
             data_update = data_update.filter(pl.col('Code Item').is_not_null() & (pl.col('Code Item') != ''))
             data_update = data_update.rename({
                         'Code Item': 'Code_Item',
@@ -74,7 +75,9 @@ class LoadData():
                         'Định dạng Tem Túi': 'Dinh_dang_Tem_Tui',
                         'Mã vạch nhỏ': 'Ma_vach_nho',
                         'Đơn vị thùng': 'Don_vi_thung',
-                        'Đơn vị túi': 'Don_vi_tui'
+                        'Đơn vị túi': 'Don_vi_tui',
+                        'Số lượng cây/bó trong thùng': 'So_luong_cay_bo_trong_thung',
+                        'Số lượng liner trong bó': 'So_luong_liner_trong_bo'
                     })
             data_update_pd = data_update.to_pandas()
             append_df_to_excel(self.fileData, data_update_pd, sheet_name = 'Database', index = False, startrow = 0, header = True, truncate_sheet = True)

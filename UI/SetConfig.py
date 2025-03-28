@@ -233,8 +233,8 @@ class Ui_SetConfig(object):
         self.light.setItemText(7, _translate("SetConfig", "8"))
         self.light.setItemText(8, _translate("SetConfig", "9"))
         self.label_6.setText(_translate("SetConfig", "Chênh lệch cho phép"))
-        self.range.setItemText(0, _translate("SetConfig", "2"))
-        self.range.setItemText(1, _translate("SetConfig", "4"))
+        self.range.setItemText(0, _translate("SetConfig", "1/4"))
+        self.range.setItemText(1, _translate("SetConfig", "1/2"))
         self.range_Confirm.setText(_translate("SetConfig", "Xác nhận"))
 import UI.pic_rc
 

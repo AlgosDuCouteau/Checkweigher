@@ -538,12 +538,12 @@
    </property>
    <item>
     <property name="text">
-     <string>2</string>
+     <string>1/4</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>4</string>
+     <string>1/2</string>
     </property>
    </item>
   </widget>
