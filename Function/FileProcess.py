@@ -45,7 +45,7 @@ class FileProcess(QtCore.QObject):
         return str(text)
 
     @QtCore.pyqtSlot()
-    def printSheet(self, data: pl.DataFrame, data_print: pl.DataFrame):
+    def printSheet(self, data: pl.DataFrame, data_print: pl.DataFrame, manual: bool = False):
         if self.is_processing:
             self.error.emit(("ProcessingError", "Excel file is currently being processed. Please wait."))
             return False
@@ -126,7 +126,11 @@ class FileProcess(QtCore.QObject):
                         ws[data_print['quan_cat_barcode'].item()].value = barcode
                         barcode = ''
                         ws[data_print['int1'].item()].value = data['INT'].item()
-                ws.api.PrintOut()
+                if manual:
+                    print_quantity = 1
+                else:
+                    print_quantity = int(data['So_tem'].item()) if data['So_tem'].item() else 1
+                ws.api.PrintOut(Copies=print_quantity)
                 wb.save()
                 wb.close()
         except Exception as e:

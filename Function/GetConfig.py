@@ -26,30 +26,30 @@ class GetConfig(object):
     
     def data(self):
         try:
-            file = self.getfilepath()
-            port = self.readfileport(file['filePort'])
+            file = self.getFilePath()
+            port = self.readFilePort(file['filePort'])
             file_final = file.copy()
-            # file_final.pop('filePort')
             file_final.update(port)
             file_final.update({'GdriveData': os.path.join(port['GdriveData'], 'My Drive/IN&PACKING.xlsm')})
             file_final.update({'GdrivePrint': os.path.join(port['GdrivePrint'], 'My Drive/in.xlsx')})
             return file_final
         except Exception as e:
             logging.error(f"Error in data method at {get_file_and_line()}: {e}")
-            raise
+            return
 
-    def getfilepath(self):
+    def getFilePath(self):
         try:
             basedir = resource_path()
             categorization_fileData = os.path.join(basedir + '/data/', 'Database.xlsx')
             categorization_filePort = os.path.join(basedir + '/data/', 'ports.txt')
             categorization_fileIN = os.path.join(basedir + '/data/', 'in.xlsx')
-            return {'fileData': categorization_fileData, 'filePrint': categorization_fileIN, 'filePort': categorization_filePort}
+            categorization_fileHeadersConfig = os.path.join(basedir + '/config/', 'headers.json')
+            return {'fileData': categorization_fileData, 'filePrint': categorization_fileIN, 'filePort': categorization_filePort, 'fileHeadersConfig': categorization_fileHeadersConfig}
         except Exception as e:
-            logging.error(f"Error in getfilepath method at {get_file_and_line()}: {e}")
-            raise
+            logging.error(f"Error in getFilePath method at {get_file_and_line()}: {e}")
+            return
     
-    def readfileport(self, filePort):
+    def readFilePort(self, filePort):
         try:
             portall = []
             with open(filePort) as f:
@@ -60,8 +60,8 @@ class GetConfig(object):
             return {'portScale': portall[0], 'portArduino': portall[1], 'Ard2Convey': int(portall[2]), 'Ard2Light': int(portall[3]),
                     'GdriveData': portall[4]+ ":/", 'GdrivePrint': portall[4]+ ":/", 'Delay2Print': float(portall[5]), 'Quan2Print': int(portall[6])}
         except Exception as e:
-            logging.error(f"Error in readfileport method at {get_file_and_line()}: {e}")
-            raise
+            logging.error(f"Error in readFilePort method at {get_file_and_line()}: {e}")
+            return
     
 if __name__ == "__main__":
     try:

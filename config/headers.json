@@ -1,0 +1,20 @@
+{
+  "headers": {
+    "Code Item": "Code_Item",
+    "ProductOf": "ProductOf",
+    "Quantity thùng": "Quantity_thung",
+    "Name": "Name",
+    "CAT": "CAT",
+    "INT": "INT",
+    "Size": "Size",
+    "Định dạng Tem Thùng": "Dinh_dang_Tem_Thung",
+    "Mã 1": "Ma_1",
+    "Mã vạch thùng đầu": "Ma_vach_thung_dau",
+    "Mã vạch thùng đuôi": "Ma_vach_thung_duoi",
+    "Mã vạch nhỏ": "Ma_vach_nho",
+    "Đơn vị thùng": "Don_vi_thung",
+    "Số lượng cây/bó trong thùng": "So_luong_cay_bo_trong_thung",
+    "Số lượng liner trong bó": "So_luong_liner_trong_bo",
+    "số tem": "So_tem"
+  }
+}

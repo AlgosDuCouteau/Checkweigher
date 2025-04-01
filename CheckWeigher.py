@@ -55,6 +55,7 @@ class MainGUI(QtWidgets.QMainWindow):
         self.filePrint = data['filePrint']
         fileUpdateData = data['GdriveData']
         fileUpdatePrint = data['GdrivePrint']
+        fileHeadersConfig = data['fileHeadersConfig']
         self.portScale = data['portScale']
         self.portArduino = data['portArduino']
         self.Ard2Convey = data['Ard2Convey']
@@ -65,8 +66,11 @@ class MainGUI(QtWidgets.QMainWindow):
         
         # Initialize components
         self.fileProcess = FileProcess(self, filePrint=self.filePrint)
+        self.progressDialog = ProgressDialog(self).create("Cập nhật", "Đang cập nhật dữ liệu...")
         self.scale = GetScale(portScale=self.portScale, portArduino=self.portArduino, Ard2Convey=self.Ard2Convey, Ard2Light=self.Ard2Light)
-        self.loadData = LoadData(self, fileData=fileData, filePrint=self.filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint)
+        self.loadData = LoadData(self, fileData=fileData, filePrint=self.filePrint, fileUpdateData=fileUpdateData, fileUpdatePrint=fileUpdatePrint, fileHeadersConfig=fileHeadersConfig)
+        self.progressDialog.close()
+        self.progressDialog = None
         t = time.time()
         self.scale.openPort()
         print(time.time() - t)
@@ -125,11 +129,15 @@ class MainGUI(QtWidgets.QMainWindow):
         self.qTimer4.timeout.connect(self.dataRfilter)
         self.qTimer4.start()
 
-    def in4(self, infor:str, title = 'Lỗi'):
+    def in4(self, infor:str, title = 'Lỗi', showOkButton = True):
         # Display an information or error message box
         msg = QtWidgets.QMessageBox()
         msg.setWindowTitle(title)
         msg.setText(infor)
+        if showOkButton:
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        else:
+            msg.setStandardButtons(QtWidgets.QMessageBox.NoButton)
         if title == 'Lỗi':
             msg.setIcon(QtWidgets.QMessageBox.Warning)
         elif title == 'Thông tin':
@@ -250,15 +258,45 @@ class MainGUI(QtWidgets.QMainWindow):
     def UpdateData(self):
         # Update data from source
         try:
-            self.loadData.updatedata()
-            self.in4(infor = 'Hoàn thành cập nhật', title = 'Thông tin')
+            self.progressDialog = ProgressDialog(self).create("Cập nhật", "Đang cập nhật dữ liệu...")
+            # Use a worker thread to avoid freezing the UI
+            worker = Worker(self.loadData.update_data)
+            worker.signals.finished.connect(self.updateData_finished)
+            worker.signals.error.connect(self.updateData_error)
+            self.threadpool.start(worker)
         except Exception as e:
             print(e)
+            if self.progressDialog:
+                self.progressDialog.close()
+                self.progressDialog = None
             self.in4(infor = 'Lỗi dữ liệu, không thể cập nhật!')
-            return
+    
+    def updateData_finished(self):
+        # Close progress dialog from main thread
+        if self.progressDialog:
+            self.progressDialog.close()
+            self.progressDialog = None
+        self.in4(infor = 'Hoàn thành cập nhật', title = 'Thông tin')
+    
+    def updateData_error(self, error):
+        # Close progress dialog from main thread
+        if self.progressDialog:
+            self.progressDialog.close()
+            self.progressDialog = None
+        _, error_instance, _ = error
+        self.in4(infor = f'Lỗi dữ liệu, không thể cập nhật: {error_instance}')
+    
+    # Add proper QtCore.pyqtSlot annotation for the update_progress method
+    @QtCore.pyqtSlot(int, str)
+    def update_progress(self, value, text=None):
+        if self.progressDialog:
+            self.progressDialog.update(value, text)
 
     @QtCore.pyqtSlot()
     def ShowStamp(self):
+        if self.checked:
+            self.in4(infor = 'Đã kiểm tra tem!')
+            return
         if len(self.ui.PdID.text()) <= 0:
             self.in4(infor = 'Quét mã sản phẩm!')
             self.ui.ProductID.setFocus()
@@ -275,7 +313,7 @@ class MainGUI(QtWidgets.QMainWindow):
             self.in4(infor = 'Đang xử lý dữ liệu. Vui lòng đợi.', title = 'Thông tin')
             return
         # Use a worker to generate an image
-        worker = Worker(self.fileProcess.printSheet, self.data, self.data_print)
+        worker = Worker(self.fileProcess.printSheet, self.data, self.data_print, True)
         worker.signals.finished.connect(self.print_success)
         worker.signals.error.connect(self.print_error)
         self.threadpool.start(worker)
