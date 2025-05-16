@@ -112,6 +112,10 @@
   {
    "optionDest": "datas",
    "value": "D:/Trung/Checkweigher/.venv/Lib/site-packages/win32ctypes;win32ctypes/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Trung/Checkweigher/config;config/"
   }
  ],
  "nonPyinstallerOptions": {
